@@ -84,6 +84,9 @@ ul {
 }
 
 .nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -208,13 +211,12 @@ ul {
     display: flex;
     flex-direction: column;
     min-height: calc(100vh - 60px);
+    background: var(--bg-elevated);
 }
 
 /* HERO SECTION */
 
 .hero-section {
-    background: var(--bg-elevated);
-    border-bottom: 1px solid var(--border);
     padding: 3rem 2rem;
     text-align: center;
 }
@@ -252,7 +254,7 @@ ul {
 
 .calendar-section {
     flex: 1;
-    padding: 2rem;
+    padding: 0 2rem 2rem;
     display: flex;
     flex-direction: column;
 }
@@ -271,7 +273,7 @@ ul {
 
 .calendar {
     flex: 1;
-    background: var(--bg-elevated);
+    background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 12px;
     overflow: hidden;
@@ -336,7 +338,6 @@ ul {
 
 .calendar-day.today {
     background: var(--navy-light);
-    border-radius: 0;
 }
 
 .calendar-day-number {
@@ -371,6 +372,7 @@ ul {
 .page-header {
     padding: 3rem 2rem 2rem;
     border-bottom: 1px solid var(--border);
+    background: var(--bg-elevated);
 }
 
 .page-header h1 {
@@ -520,12 +522,13 @@ ul {
     align-items: center;
     justify-content: center;
     padding: 2rem;
+    background: var(--bg-elevated);
 }
 
 .auth-card {
     width: 100%;
     max-width: 400px;
-    background: var(--bg-elevated);
+    background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 2.5rem;
@@ -570,7 +573,7 @@ ul {
     padding: 0.75rem 1rem;
     font-family: inherit;
     font-size: 1rem;
-    background: var(--bg);
+    background: var(--bg-elevated);
     border: 1px solid var(--border);
     border-radius: 6px;
     color: var(--text);
@@ -651,7 +654,7 @@ ul {
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
     padding: 2rem;
-    background: var(--bg-elevated);
+    background: var(--bg);
     border-radius: 12px;
     border: 1px solid var(--border);
 }
@@ -791,7 +794,7 @@ ul {
     }
     
     .calendar-section {
-        padding: 1rem;
+        padding: 0 1rem 1rem;
     }
     
     .calendar-weekdays div {
