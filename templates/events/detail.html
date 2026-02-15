@@ -44,10 +44,12 @@
                 <div class="detail-section" style="padding-top: 1.5rem; border-top: 1px solid var(--border);">
                     {% if is_registered %}
                     <form method="POST" action="{{ url_for('events.unregister', event_id=event.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit" class="btn btn-secondary btn-full">Cancel Registration</button>
                     </form>
                     {% elif not event.is_full() %}
                     <form method="POST" action="{{ url_for('events.register', event_id=event.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit" class="btn btn-primary btn-full btn-lg">Register</button>
                     </form>
                     {% else %}

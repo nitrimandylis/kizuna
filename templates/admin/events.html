@@ -3,55 +3,62 @@
 {% block title %}Manage Events - Kizuna{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>Manage Events</h1>
-    <p>View and manage all events</p>
-</div>
+<div class="admin-page">
+    <div class="page-header">
+        <div class="container">
+            <h1>Manage Events</h1>
+            <p>View and manage all events</p>
+        </div>
+    </div>
 
-<section class="section">
-    <div class="admin-header">
-        <div></div>
-        <a href="{{ url_for('admin.create_event') }}" class="btn btn-primary">Create Event</a>
+    <div class="page-content">
+        <div class="container">
+            <div class="admin-header">
+                <div></div>
+                <a href="{{ url_for('admin.create_event') }}" class="btn btn-primary">Create Event</a>
+            </div>
+            
+            {% if events.items %}
+            <div class="admin-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Registrations</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in events.items %}
+                        <tr>
+                            <td>{{ event.title }}</td>
+                            <td><span class="tag cas-{{ event.cas_type|lower }}">{{ event.cas_type }}</span></td>
+                            <td>{{ event.event_date.strftime('%b %d, %Y') }}</td>
+                            <td>{{ 'Published' if event.is_published else 'Draft' }}</td>
+                            <td>{{ event.get_registered_count() }}{% if event.max_capacity %} / {{ event.max_capacity }}{% endif %}</td>
+                            <td>
+                                <a href="{{ url_for('events.detail', event_id=event.id) }}" class="btn btn-ghost btn-sm">View</a>
+                                <form method="POST" action="{{ url_for('admin.delete_event', event_id=event.id) }}" style="display: inline;" onsubmit="return confirm('Delete this event?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--primary);">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h3>No events yet</h3>
+                <p>Create your first event to get started.</p>
+                <a href="{{ url_for('admin.create_event') }}" class="btn btn-primary" style="margin-top: 1rem;">Create Event</a>
+            </div>
+            {% endif %}
+        </div>
     </div>
-    
-    {% if events.items %}
-    <div class="admin-table">
-        <table>
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                    <th>Registrations</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for event in events.items %}
-                <tr>
-                    <td>{{ event.title }}</td>
-                    <td><span class="event-type cas-{{ event.cas_type|lower }}">{{ event.cas_type }}</span></td>
-                    <td>{{ event.event_date.strftime('%b %d, %Y') }}</td>
-                    <td>{{ 'Published' if event.is_published else 'Draft' }}</td>
-                    <td>{{ event.get_registered_count() }}{% if event.max_capacity %} / {{ event.max_capacity }}{% endif %}</td>
-                    <td>
-                        <a href="{{ url_for('events.detail', event_id=event.id) }}" class="btn btn-ghost btn-sm">View</a>
-                        <form method="POST" action="{{ url_for('admin.delete_event', event_id=event.id) }}" style="display: inline;" onsubmit="return confirm('Delete this event?');">
-                            <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--primary);">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% else %}
-    <div class="empty-state">
-        <h3>No events yet</h3>
-        <p>Create your first event to get started.</p>
-        <a href="{{ url_for('admin.create_event') }}" class="btn btn-primary" style="margin-top: var(--space-md);">Create Event</a>
-    </div>
-    {% endif %}
-</section>
+</div>
 {% endblock %}
