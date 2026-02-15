@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 702 702" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-654.5,-657.5)">
+        <g transform="matrix(0.856098,0,0,0.856098,238.436585,83.058537)">
+            <path d="M896,671C1122.285,671 1306,854.715 1306,1081C1306,1307.285 1122.285,1491 896,1491C669.715,1491 486,1307.285 486,1081C486,854.715 669.715,671 896,671ZM896,710.643C1100.406,710.643 1266.357,876.594 1266.357,1081C1266.357,1285.406 1100.406,1451.357 896,1451.357C691.594,1451.357 525.643,1285.406 525.643,1081C525.643,876.594 691.594,710.643 896,710.643Z" style="fill:rgb(255,73,82);"/>
+        </g>
+        <g transform="matrix(3.357596,0,0,3.357596,1482.595761,-1231.677029)">
+            <g transform="matrix(183.333333,0,0,183.333333,-48.24827,736.258503)">
+            </g>
+            <text x="-231.582px" y="736.259px" style="font-family:'Natsume';font-size:183.333px;fill:rgb(255,73,82);">絆</text>
+        </g>
+    </g>
+</svg>

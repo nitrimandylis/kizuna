@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Kizuna{% endblock %}
+
+{% block content %}
+<div class="home-page">
+    <section class="home-hero">
+        <img src="{{ url_for('static', filename='images/kizuna-logo-small.svg') }}" alt="Kizuna" class="hero-logo">
+        <h1>Connect. <span>Collaborate.</span> Grow.</h1>
+    </section>
+
+    <section class="home-calendar">
+        <div class="calendar-header">
+            <button class="btn btn-ghost" id="prevMonth">←</button>
+            <h2 class="calendar-title" id="calendarTitle"></h2>
+            <button class="btn btn-ghost" id="nextMonth">→</button>
+        </div>
+        <div class="calendar" id="calendar">
+            <div class="calendar-weekdays">
+                <div>Sun</div>
+                <div>Mon</div>
+                <div>Tue</div>
+                <div>Wed</div>
+                <div>Thu</div>
+                <div>Fri</div>
+                <div>Sat</div>
+            </div>
+            <div class="calendar-days" id="calendarDays"></div>
+        </div>
+    </section>
+</div>
+{% endblock %}
