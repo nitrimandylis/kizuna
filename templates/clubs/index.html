@@ -3,32 +3,38 @@
 {% block title %}Clubs - Kizuna{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>Clubs</h1>
-    <p>Find your community</p>
-</div>
+<div class="standard-page">
+    <div class="page-header">
+        <div class="container">
+            <h1>Clubs</h1>
+            <p>Find your community</p>
+        </div>
+    </div>
 
-<section class="section">
-    {% if clubs.items %}
-    <div class="clubs-grid">
-        {% for club in clubs.items %}
-        <article class="club-card">
-            <h3>{{ club.name }}</h3>
-            <p>{{ club.description[:150] }}{% if club.description|length > 150 %}...{% endif %}</p>
-            {% if club.meeting_day %}
-            <div style="margin-top: var(--space-md); font-size: var(--text-sm); color: var(--text-muted);">
-                Meets {{ club.meeting_day }}{% if club.meeting_time %} at {{ club.meeting_time }}{% endif %}
+    <div class="page-content">
+        <div class="container">
+            {% if clubs.items %}
+            <div class="cards-grid">
+                {% for club in clubs.items %}
+                <article class="card">
+                    <h3>{{ club.name }}</h3>
+                    <p>{{ club.description[:150] }}{% if club.description|length > 150 %}...{% endif %}</p>
+                    {% if club.meeting_day %}
+                    <div class="card-meta">
+                        <span>Meets {{ club.meeting_day }}{% if club.meeting_time %} at {{ club.meeting_time }}{% endif %}</span>
+                    </div>
+                    {% endif %}
+                    <a href="{{ url_for('clubs.detail', club_id=club.id) }}" class="btn btn-ghost btn-sm" style="margin-top: 1rem;">Learn More →</a>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h3>No clubs yet</h3>
+                <p>Check back soon for club listings.</p>
             </div>
             {% endif %}
-            <a href="{{ url_for('clubs.detail', club_id=club.id) }}" class="btn btn-ghost btn-sm" style="margin-top: var(--space-md);">Learn More →</a>
-        </article>
-        {% endfor %}
+        </div>
     </div>
-    {% else %}
-    <div class="empty-state">
-        <h3>No clubs yet</h3>
-        <p>Check back soon for club listings.</p>
-    </div>
-    {% endif %}
-</section>
+</div>
 {% endblock %}

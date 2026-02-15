@@ -3,55 +3,61 @@
 {% block title %}{{ club.name }} - Kizuna{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>{{ club.name }}</h1>
-    <p>Club details</p>
-</div>
-
-<section class="section">
-    <div class="detail-card" style="max-width: 640px;">
-        {% if club.description %}
-        <div class="detail-section">
-            <div class="detail-label">About</div>
-            <div class="detail-value" style="color: var(--text-muted); line-height: 1.7;">{{ club.description }}</div>
+<div class="standard-page">
+    <div class="page-header">
+        <div class="container">
+            <h1>{{ club.name }}</h1>
+            <p>Club details</p>
         </div>
-        {% endif %}
-        
-        {% if club.meeting_day or club.meeting_location %}
-        <div class="detail-section">
-            <div class="detail-label">Meetings</div>
-            <div class="detail-value">
-                {% if club.meeting_day %}{{ club.meeting_day }}{% if club.meeting_time %} at {{ club.meeting_time }}{% endif %}{% endif %}
-                {% if club.meeting_location %}<br>{{ club.meeting_location }}{% endif %}
-            </div>
-        </div>
-        {% endif %}
-        
-        {% if club.leader_name %}
-        <div class="detail-section">
-            <div class="detail-label">Club Leader</div>
-            <div class="detail-value">{{ club.leader_name }}{% if club.leader_email %}<br><span style="color: var(--text-muted);">{{ club.leader_email }}</span>{% endif %}</div>
-        </div>
-        {% endif %}
-        
-        {% if club.website_url %}
-        <div class="detail-section">
-            <div class="detail-label">Website</div>
-            <div class="detail-value"><a href="{{ club.website_url }}" style="color: var(--primary);" target="_blank">{{ club.website_url }}</a></div>
-        </div>
-        {% endif %}
-        
-        {% if events %}
-        <div class="detail-section" style="padding-top: var(--space-lg); border-top: 1px solid var(--border);">
-            <div class="detail-label">Upcoming Events</div>
-            {% for event in events %}
-            <div style="padding: var(--space-md) 0; border-bottom: 1px solid var(--border);">
-                <a href="{{ url_for('events.detail', event_id=event.id) }}" style="font-weight: 500;">{{ event.title }}</a>
-                <div style="font-size: var(--text-sm); color: var(--text-muted); margin-top: var(--space-xs);">{{ event.event_date.strftime('%B %d, %Y') }}</div>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
     </div>
-</section>
+
+    <div class="page-content">
+        <div class="container" style="max-width: 640px;">
+            <div class="card">
+                {% if club.description %}
+                <div class="detail-section">
+                    <div class="detail-label">About</div>
+                    <div class="detail-value" style="color: var(--text-muted); line-height: 1.7;">{{ club.description }}</div>
+                </div>
+                {% endif %}
+                
+                {% if club.meeting_day or club.meeting_location %}
+                <div class="detail-section">
+                    <div class="detail-label">Meetings</div>
+                    <div class="detail-value">
+                        {% if club.meeting_day %}{{ club.meeting_day }}{% if club.meeting_time %} at {{ club.meeting_time }}{% endif %}{% endif %}
+                        {% if club.meeting_location %}<br>{{ club.meeting_location }}{% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if club.leader_name %}
+                <div class="detail-section">
+                    <div class="detail-label">Club Leader</div>
+                    <div class="detail-value">{{ club.leader_name }}{% if club.leader_email %}<br><span style="color: var(--text-muted);">{{ club.leader_email }}</span>{% endif %}</div>
+                </div>
+                {% endif %}
+                
+                {% if club.website_url %}
+                <div class="detail-section">
+                    <div class="detail-label">Website</div>
+                    <div class="detail-value"><a href="{{ club.website_url }}" style="color: var(--primary);" target="_blank">{{ club.website_url }}</a></div>
+                </div>
+                {% endif %}
+                
+                {% if events %}
+                <div class="detail-section" style="padding-top: 1.5rem; border-top: 1px solid var(--border);">
+                    <div class="detail-label">Upcoming Events</div>
+                    {% for event in events %}
+                    <div style="padding: 1rem 0; border-bottom: 1px solid var(--border);">
+                        <a href="{{ url_for('events.detail', event_id=event.id) }}" style="font-weight: 500;">{{ event.title }}</a>
+                        <div style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.25rem;">{{ event.event_date.strftime('%B %d, %Y') }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

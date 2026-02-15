@@ -1,37 +1,41 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Dashboard - Kizuna{% endblock %}
+{% block title %}Admin - Kizuna{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>Admin Dashboard</h1>
-    <p>Manage the platform</p>
+<div class="admin-page">
+    <div class="page-header">
+        <div class="container">
+            <h1>Admin Dashboard</h1>
+            <p>Manage the platform</p>
+        </div>
+    </div>
+
+    <div class="page-content">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">{{ total_events }}</div>
+                    <div class="stat-label">Events</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ total_registrations }}</div>
+                    <div class="stat-label">Registrations</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ total_users }}</div>
+                    <div class="stat-label">Users</div>
+                </div>
+            </div>
+
+            <div class="admin-header">
+                <h2 class="section-title">Quick Actions</h2>
+            </div>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="{{ url_for('admin.manage_events') }}" class="btn btn-secondary">Manage Events</a>
+                <a href="{{ url_for('admin.create_event') }}" class="btn btn-primary">Create Event</a>
+            </div>
+        </div>
+    </div>
 </div>
-
-<section class="section">
-    <div class="stats-grid">
-        <div class="stat">
-            <div class="stat-value">{{ total_events }}</div>
-            <div class="stat-label">Events</div>
-        </div>
-        <div class="stat">
-            <div class="stat-value">{{ total_registrations }}</div>
-            <div class="stat-label">Registrations</div>
-        </div>
-        <div class="stat">
-            <div class="stat-value">{{ total_users }}</div>
-            <div class="stat-label">Users</div>
-        </div>
-    </div>
-</section>
-
-<section class="section">
-    <div class="admin-header">
-        <h2 class="section-title">Quick Actions</h2>
-    </div>
-    <div style="display: flex; gap: var(--space-md); flex-wrap: wrap;">
-        <a href="{{ url_for('admin.manage_events') }}" class="btn btn-secondary">Manage Events</a>
-        <a href="{{ url_for('admin.create_event') }}" class="btn btn-primary">Create Event</a>
-    </div>
-</section>
 {% endblock %}

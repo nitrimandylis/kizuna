@@ -46,21 +46,22 @@
         {% endif %}
     {% endwith %}
 
-    <main>
-        {% block content %}{% endblock %}
-    </main>
-
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-brand">Kizuna Initiative</div>
-            <div class="footer-links">
-                <a href="{{ url_for('main.about') }}">About</a>
-                <a href="{{ url_for('clubs.index') }}">Clubs</a>
-                <a href="{{ url_for('events.index') }}">Events</a>
-                <a href="mailto:kizuna@cgs.gr">Contact</a>
+    <div class="page-wrapper">
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-brand">Kizuna Initiative</div>
+                <div class="footer-links">
+                    <a href="{{ url_for('main.about') }}">About</a>
+                    <a href="{{ url_for('clubs.index') }}">Clubs</a>
+                    <a href="{{ url_for('events.index') }}">Events</a>
+                    <a href="mailto:kizuna@cgs.gr">Contact</a>
+                </div>
             </div>
-        </div>
-    </footer>
+        </footer>
+    </div>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
