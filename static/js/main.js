@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     });
     
-    // Calendar
+    // Calendar - always renders 6 rows (42 cells) for consistent height
     const calendarDays = document.getElementById('calendarDays');
     const calendarTitle = document.getElementById('calendarTitle');
     const prevBtn = document.getElementById('prevMonth');
@@ -47,28 +47,29 @@ document.addEventListener('DOMContentLoaded', function() {
             const today = new Date();
             const todayStr = today.toDateString();
             
-            // Calculate rows needed (5 or 6)
-            const totalCells = startDay + daysInMonth;
-            const rows = Math.ceil(totalCells / 7);
-            const cellCount = rows * 7;
+            // Always render 42 cells (6 rows x 7 days) for consistent height
+            const totalCells = 42;
             
             let html = '';
             let dayCount = 1;
             let nextMonthDay = 1;
             
-            for (let i = 0; i < cellCount; i++) {
+            for (let i = 0; i < totalCells; i++) {
                 let dayNumber;
                 let isOtherMonth = false;
                 let isToday = false;
                 
                 if (i < startDay) {
+                    // Previous month days
                     dayNumber = daysInPrevMonth - startDay + i + 1;
                     isOtherMonth = true;
                 } else if (dayCount > daysInMonth) {
+                    // Next month days
                     dayNumber = nextMonthDay;
                     nextMonthDay++;
                     isOtherMonth = true;
                 } else {
+                    // Current month days
                     dayNumber = dayCount;
                     const cellDate = new Date(year, month, dayCount);
                     if (cellDate.toDateString() === todayStr) {

@@ -4,12 +4,14 @@
 
 {% block content %}
 <div class="home-page">
-    <section class="home-hero">
-        <img src="{{ url_for('static', filename='images/kizuna-logo-small.svg') }}" alt="Kizuna" class="hero-logo">
-        <h1>Connect. <span>Collaborate.</span> Grow.</h1>
+    <section class="hero-section">
+        <div class="hero-content">
+            <img src="{{ url_for('static', filename='images/kizuna-logo-small.svg') }}" alt="Kizuna" class="hero-logo">
+            <h1>Connect. <span>Collaborate.</span> Grow.</h1>
+        </div>
     </section>
 
-    <section class="home-calendar">
+    <section class="calendar-section">
         <div class="calendar-header">
             <button class="btn btn-ghost" id="prevMonth">←</button>
             <h2 class="calendar-title" id="calendarTitle"></h2>
