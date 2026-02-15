@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     });
     
-    // Calendar - always renders 6 rows (42 cells) for consistent height
+    // Calendar functionality
     const calendarDays = document.getElementById('calendarDays');
     const calendarTitle = document.getElementById('calendarTitle');
     const prevBtn = document.getElementById('prevMonth');
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
                            'July', 'August', 'September', 'October', 'November', 'December'];
         
-        function renderCalendar(date) {
+        function renderCalendar(date, events) {
             const year = date.getFullYear();
             const month = date.getMonth();
             
@@ -45,7 +45,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const daysInPrevMonth = new Date(year, month, 0).getDate();
             
             const today = new Date();
-            const todayStr = today.toDateString();
+            const todayStr = today.getFullYear() + '-' + 
+                            String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                            String(today.getDate()).padStart(2, '0');
+            
+            // Group events by date
+            const eventsByDate = {};
+            if (events) {
+                events.forEach(function(event) {
+                    if (!eventsByDate[event.date]) {
+                        eventsByDate[event.date] = [];
+                    }
+                    eventsByDate[event.date].push(event);
+                });
+            }
             
             // Always render 42 cells (6 rows x 7 days) for consistent height
             const totalCells = 42;
@@ -58,21 +71,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 let dayNumber;
                 let isOtherMonth = false;
                 let isToday = false;
+                let dateStr = '';
                 
                 if (i < startDay) {
-                    // Previous month days
                     dayNumber = daysInPrevMonth - startDay + i + 1;
                     isOtherMonth = true;
                 } else if (dayCount > daysInMonth) {
-                    // Next month days
                     dayNumber = nextMonthDay;
                     nextMonthDay++;
                     isOtherMonth = true;
                 } else {
-                    // Current month days
                     dayNumber = dayCount;
-                    const cellDate = new Date(year, month, dayCount);
-                    if (cellDate.toDateString() === todayStr) {
+                    const m = String(month + 1).padStart(2, '0');
+                    const d = String(dayCount).padStart(2, '0');
+                    dateStr = year + '-' + m + '-' + d;
+                    
+                    if (dateStr === todayStr) {
                         isToday = true;
                     }
                     dayCount++;
@@ -82,33 +96,63 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (isOtherMonth) classes.push('other-month');
                 if (isToday) classes.push('today');
                 
-                const dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(dayNumber).padStart(2, '0');
-                
                 html += '<div class="' + classes.join(' ') + '" data-date="' + dateStr + '">';
                 html += '<div class="calendar-day-header">';
                 html += '<span class="calendar-day-number">' + dayNumber + '</span>';
                 html += '</div>';
-                html += '<div class="calendar-day-content"></div>';
+                html += '<div class="calendar-day-content">';
+                
+                // Add events for this date
+                if (dateStr && eventsByDate[dateStr]) {
+                    eventsByDate[dateStr].forEach(function(event) {
+                        html += '<div class="calendar-event cas-' + event.cas_type + '" title="' + event.title + '">';
+                        html += event.title;
+                        html += '</div>';
+                    });
+                }
+                
+                html += '</div>';
                 html += '</div>';
             }
             
             calendarDays.innerHTML = html;
         }
         
+        function fetchEvents(year, month) {
+            fetch('/api/events?year=' + year + '&month=' + month)
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(events) {
+                    renderCalendar(currentDate, events);
+                })
+                .catch(function(error) {
+                    console.error('Error fetching events:', error);
+                    renderCalendar(currentDate, []);
+                });
+        }
+        
+        function loadCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth() + 1;
+            fetchEvents(year, month);
+        }
+        
         if (prevBtn) {
             prevBtn.addEventListener('click', function() {
                 currentDate.setMonth(currentDate.getMonth() - 1);
-                renderCalendar(currentDate);
+                loadCalendar();
             });
         }
         
         if (nextBtn) {
             nextBtn.addEventListener('click', function() {
                 currentDate.setMonth(currentDate.getMonth() + 1);
-                renderCalendar(currentDate);
+                loadCalendar();
             });
         }
         
-        renderCalendar(currentDate);
+        // Initial load
+        loadCalendar();
     }
 });
