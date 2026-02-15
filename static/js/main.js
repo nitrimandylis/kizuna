@@ -85,8 +85,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(dayNumber).padStart(2, '0');
                 
                 html += '<div class="' + classes.join(' ') + '" data-date="' + dateStr + '">';
+                html += '<div class="calendar-day-header">';
                 html += '<span class="calendar-day-number">' + dayNumber + '</span>';
-                html += '<div class="calendar-event-dots"></div>';
+                html += '</div>';
+                html += '<div class="calendar-day-content"></div>';
                 html += '</div>';
             }
             
