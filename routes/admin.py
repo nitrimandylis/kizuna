@@ -3,6 +3,10 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from models import db, Event, EventRegistration, User, Club
 from datetime import datetime
+from utils import (
+    sanitize_input, validate_title, validate_description, 
+    validate_cas_type, validate_integer, validate_url
+)
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -41,21 +45,59 @@ def manage_events():
 @admin_required
 def create_event():
     if request.method == 'POST':
+        errors = []
+        
+        # Validate title
+        valid, title = validate_title(request.form.get('title', ''))
+        if not valid:
+            errors.append(title)
+        
+        # Validate description
+        valid, description = validate_description(request.form.get('description', ''))
+        if not valid:
+            errors.append(description)
+        
+        # Validate CAS type
+        valid, cas_type = validate_cas_type(request.form.get('cas_type', ''))
+        if not valid:
+            errors.append(cas_type)
+        
+        # Validate date
+        event_date_str = request.form.get('event_date', '')
+        if not event_date_str:
+            errors.append('Event date is required')
+        else:
+            try:
+                event_date = datetime.strptime(event_date_str, "%Y-%m-%d")
+            except ValueError:
+                errors.append('Invalid date format')
+        
+        # Validate max_capacity
+        valid, max_capacity = validate_integer(
+            request.form.get('max_capacity'), 
+            "Maximum capacity", 
+            min_val=1, 
+            max_val=10000
+        )
+        if not valid:
+            errors.append(max_capacity)
+        
+        if errors:
+            for error in errors:
+                flash(error, 'error')
+            clubs = Club.query.filter_by(is_active=True).all()
+            return render_template('admin/create_event.html', clubs=clubs)
+        
+        # Create event
         event = Event(
-            title=request.form.get('title'),
-            description=request.form.get('description'),
-            cas_type=request.form.get('cas_type'),
-            location=request.form.get('location'),
+            title=title,
+            description=description,
+            cas_type=cas_type,
+            event_date=event_date,
+            location=sanitize_input(request.form.get('location', ''), max_length=200),
+            max_capacity=max_capacity,
             is_published=True
         )
-
-        event_date_str = request.form.get('event_date')
-        if event_date_str:
-            event.event_date = datetime.strptime(event_date_str, "%Y-%m-%d")
-        
-        max_capacity = request.form.get('max_capacity')
-        if max_capacity:
-            event.max_capacity = int(max_capacity)
         
         club_id = request.form.get('club_id')
         if club_id:
@@ -77,28 +119,61 @@ def edit_event(event_id):
     event = Event.query.get_or_404(event_id)
     
     if request.method == 'POST':
-        event.title = request.form.get('title', event.title)
-        event.description = request.form.get('description', event.description)
-        event.cas_type = request.form.get('cas_type', event.cas_type)
-        event.location = request.form.get('location', event.location)
+        errors = []
         
-        event_date_str = request.form.get('event_date')
-        if event_date_str:
-            event.event_date = datetime.strptime(event_date_str, "%Y-%m-%d")
-        
-        max_capacity = request.form.get('max_capacity')
-        if max_capacity:
-            event.max_capacity = int(max_capacity)
+        # Validate title
+        valid, title = validate_title(request.form.get('title', ''))
+        if not valid:
+            errors.append(title)
         else:
-            event.max_capacity = None
+            event.title = title
+        
+        # Validate description
+        valid, description = validate_description(request.form.get('description', ''))
+        if not valid:
+            errors.append(description)
+        else:
+            event.description = description
+        
+        # Validate CAS type
+        valid, cas_type = validate_cas_type(request.form.get('cas_type', ''))
+        if not valid:
+            errors.append(cas_type)
+        else:
+            event.cas_type = cas_type
+        
+        # Validate date
+        event_date_str = request.form.get('event_date', '')
+        if event_date_str:
+            try:
+                event.event_date = datetime.strptime(event_date_str, "%Y-%m-%d")
+            except ValueError:
+                errors.append('Invalid date format')
+        
+        # Validate max_capacity
+        valid, max_capacity = validate_integer(
+            request.form.get('max_capacity'), 
+            "Maximum capacity", 
+            min_val=1, 
+            max_val=10000
+        )
+        if not valid:
+            errors.append(max_capacity)
+        else:
+            event.max_capacity = max_capacity
+        
+        event.location = sanitize_input(request.form.get('location', ''), max_length=200)
         
         club_id = request.form.get('club_id')
-        if club_id:
-            event.club_id = int(club_id)
-        else:
-            event.club_id = None
+        event.club_id = int(club_id) if club_id else None
         
         event.is_published = request.form.get('is_published') == 'on'
+        
+        if errors:
+            for error in errors:
+                flash(error, 'error')
+            clubs = Club.query.filter_by(is_active=True).all()
+            return render_template('admin/edit_event.html', event=event, clubs=clubs)
         
         db.session.commit()
         flash('Event updated successfully', 'success')
@@ -131,15 +206,37 @@ def manage_clubs():
 @admin_required
 def create_club():
     if request.method == 'POST':
+        errors = []
+        
+        # Validate name
+        valid, name = validate_title(request.form.get('name', ''), max_length=120)
+        if not valid:
+            errors.append(name)
+        
+        # Validate description
+        valid, description = validate_description(request.form.get('description', ''))
+        if not valid:
+            errors.append(description)
+        
+        # Validate URLs
+        valid, website_url = validate_url(request.form.get('website_url', ''))
+        if not valid:
+            errors.append(website_url)
+        
+        if errors:
+            for error in errors:
+                flash(error, 'error')
+            return render_template('admin/create_club.html')
+        
         club = Club(
-            name=request.form.get('name'),
-            description=request.form.get('description'),
-            meeting_day=request.form.get('meeting_day'),
-            meeting_time=request.form.get('meeting_time'),
-            meeting_location=request.form.get('meeting_location'),
-            leader_name=request.form.get('leader_name'),
-            leader_email=request.form.get('leader_email'),
-            website_url=request.form.get('website_url'),
+            name=name,
+            description=description,
+            meeting_day=sanitize_input(request.form.get('meeting_day', ''), max_length=20),
+            meeting_time=sanitize_input(request.form.get('meeting_time', ''), max_length=10),
+            meeting_location=sanitize_input(request.form.get('meeting_location', ''), max_length=120),
+            leader_name=sanitize_input(request.form.get('leader_name', ''), max_length=120),
+            leader_email=sanitize_input(request.form.get('leader_email', ''), max_length=120),
+            website_url=website_url,
             is_active=True
         )
         
@@ -158,15 +255,40 @@ def edit_club(club_id):
     club = Club.query.get_or_404(club_id)
     
     if request.method == 'POST':
-        club.name = request.form.get('name', club.name)
-        club.description = request.form.get('description', club.description)
-        club.meeting_day = request.form.get('meeting_day')
-        club.meeting_time = request.form.get('meeting_time')
-        club.meeting_location = request.form.get('meeting_location')
-        club.leader_name = request.form.get('leader_name')
-        club.leader_email = request.form.get('leader_email')
-        club.website_url = request.form.get('website_url')
+        errors = []
+        
+        # Validate name
+        valid, name = validate_title(request.form.get('name', ''), max_length=120)
+        if not valid:
+            errors.append(name)
+        else:
+            club.name = name
+        
+        # Validate description
+        valid, description = validate_description(request.form.get('description', ''))
+        if not valid:
+            errors.append(description)
+        else:
+            club.description = description
+        
+        # Validate URLs
+        valid, website_url = validate_url(request.form.get('website_url', ''))
+        if not valid:
+            errors.append(website_url)
+        else:
+            club.website_url = website_url
+        
+        club.meeting_day = sanitize_input(request.form.get('meeting_day', ''), max_length=20)
+        club.meeting_time = sanitize_input(request.form.get('meeting_time', ''), max_length=10)
+        club.meeting_location = sanitize_input(request.form.get('meeting_location', ''), max_length=120)
+        club.leader_name = sanitize_input(request.form.get('leader_name', ''), max_length=120)
+        club.leader_email = sanitize_input(request.form.get('leader_email', ''), max_length=120)
         club.is_active = request.form.get('is_active') == 'on'
+        
+        if errors:
+            for error in errors:
+                flash(error, 'error')
+            return render_template('admin/edit_club.html', club=club)
         
         db.session.commit()
         flash('Club updated successfully', 'success')
