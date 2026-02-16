@@ -2,36 +2,31 @@
 
 A community platform for IBDP students to coordinate CAS experiences, clubs, and events.
 
-## Tech Stack
-
-- **Backend:** Flask, SQLAlchemy, Flask-Login
-- **Database:** PostgreSQL (Supabase)
-- **Frontend:** Jinja2 templates, CSS, JavaScript
-- **Deployment:** Render
-
 ## Project Structure
 
 ```
 kizuna/
-├── app.py              # Flask app factory
-├── wsgi.py             # WSGI entry point for production
-├── config.py           # Configuration settings
-├── models.py           # Database models
-├── utils.py            # Utility functions
-├── mail.py             # Email utilities
-├── logger.py           # Logging configuration
-├── routes/             # Route blueprints
-│   ├── auth.py         # Authentication routes
-│   ├── events.py       # Event routes
-│   ├── clubs.py        # Club routes
-│   ├── profile.py      # User profile routes
-│   ├── admin.py        # Admin routes
-│   └── main.py         # Main routes
-├── templates/          # Jinja2 templates
-├── static/             # CSS, JS, images
-├── migrations/         # Database migrations
-├── requirements.txt    # Python dependencies
-└── render.yaml         # Render deployment config
+├── backend/                # Python backend
+│   ├── app.py              # Flask app factory
+│   ├── config.py           # Configuration settings
+│   ├── models.py           # Database models
+│   ├── utils.py            # Utility functions
+│   ├── mail.py             # Email utilities
+│   ├── logger.py           # Logging configuration
+│   ├── routes/             # Route blueprints
+│   │   ├── auth.py         # Authentication
+│   │   ├── events.py       # Events
+│   │   ├── clubs.py        # Clubs
+│   │   ├── profile.py      # User profiles
+│   │   ├── admin.py        # Admin panel
+│   │   ├── main.py         # Main routes
+│   │   └── newsletter.py   # Newsletter
+│   └── migrations/         # Database migrations
+├── templates/              # Jinja2 HTML templates
+├── static/                 # CSS, JS, images
+├── wsgi.py                 # WSGI entry point
+├── requirements.txt        # Python dependencies
+└── render.yaml             # Render deployment config
 ```
 
 ## Quick Start
@@ -44,17 +39,15 @@ pip install -r requirements.txt
 cp .env.example .env
 
 # Run database migrations
-flask db upgrade
+cd backend && flask db upgrade && cd ..
 
 # Start development server
-python app.py
+python wsgi.py
 ```
 
 Visit http://localhost:5001
 
-## Deployment
-
-### Render + Supabase
+## Deployment (Render + Supabase)
 
 1. Create a Supabase project and get the database connection string
 2. Push this repo to GitHub
@@ -74,6 +67,13 @@ Visit http://localhost:5001
 | `MAIL_USERNAME` | SMTP username (optional) |
 | `MAIL_PASSWORD` | SMTP password (optional) |
 
-## License
+## Tech Stack
+
+- **Backend:** Flask, SQLAlchemy, Flask-Login
+- **Database:** PostgreSQL (Supabase)
+- **Frontend:** Jinja2 templates, CSS, JavaScript
+- **Deployment:** Render
+
+---
 
 Kizuna Initiative - CGS Athens

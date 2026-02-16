@@ -24,7 +24,12 @@ def create_app(config_name=None):
     if config_name is None:
         config_name = os.getenv('FLASK_ENV', 'development')
 
-    app = Flask(__name__)
+    # Get the project root directory (parent of backend)
+    basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    
+    app = Flask(__name__,
+                template_folder=os.path.join(basedir, 'templates'),
+                static_folder=os.path.join(basedir, 'static'))
     app.config.from_object(config[config_name])
     
     # Setup logging
@@ -179,10 +184,11 @@ def create_app(config_name=None):
     return app
 
 
+# For production (gunicorn app:app)
+app = create_app()
+
+
 if __name__ == '__main__':
     app = create_app()
     logger.info("Starting development server on port 5001")
     app.run(debug=True, port=5001)
-
-# For production (gunicorn app:app)
-app = create_app()
