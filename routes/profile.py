@@ -14,12 +14,27 @@ def index():
     """Show user profile with registered events."""
     page = request.args.get('page', 1, type=int)
     
-    # Get user's event registrations
+    from datetime import datetime
+    
+    total_registrations = EventRegistration.query.filter_by(user_id=current_user.id).count()
+    attended_count = EventRegistration.query.filter_by(
+        user_id=current_user.id, 
+        status='attended'
+    ).count()
+    
+    member_days = (datetime.utcnow() - current_user.created_at).days
+    
     registrations = EventRegistration.query.filter_by(
         user_id=current_user.id
     ).order_by(EventRegistration.registered_at.desc()).paginate(page=page, per_page=10)
     
-    return render_template('profile/index.html', registrations=registrations)
+    stats = {
+        'total_registrations': total_registrations,
+        'attended_count': attended_count,
+        'member_days': member_days
+    }
+    
+    return render_template('profile/index.html', registrations=registrations, stats=stats)
 
 
 @profile_bp.route('/edit', methods=['GET', 'POST'])

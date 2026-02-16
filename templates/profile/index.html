@@ -16,6 +16,28 @@
             <div class="profile-grid">
                 <!-- Profile Info -->
                 <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar-large">
+                            {{ current_user.username[0]|upper }}
+                        </div>
+                        <h2 class="profile-username">{{ current_user.username }}</h2>
+                    </div>
+                    
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <span class="profile-stat-value">{{ stats.total_registrations }}</span>
+                            <span class="profile-stat-label">Events Registered</span>
+                        </div>
+                        <div class="profile-stat">
+                            <span class="profile-stat-value">{{ stats.attended_count }}</span>
+                            <span class="profile-stat-label">Events Attended</span>
+                        </div>
+                        <div class="profile-stat">
+                            <span class="profile-stat-value">{% if stats.member_days >= 30 %}{{ (stats.member_days // 30) }} month{% if (stats.member_days // 30) != 1 %}s{% endif %}{% else %}{{ stats.member_days }} day{% if stats.member_days != 1 %}s{% endif %}{% endif %}</span>
+                            <span class="profile-stat-label">Member For</span>
+                        </div>
+                    </div>
+                    
                     <h2>Account Information</h2>
                     <div class="profile-info">
                         <div class="info-row">
