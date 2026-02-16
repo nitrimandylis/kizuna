@@ -183,3 +183,6 @@ if __name__ == '__main__':
     app = create_app()
     logger.info("Starting development server on port 5001")
     app.run(debug=True, port=5001)
+
+# For production (gunicorn app:app)
+app = create_app()
