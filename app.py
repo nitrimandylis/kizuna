@@ -1,10 +1,11 @@
 import os
 import logging
-from flask import Flask, session, request, g
+from flask import Flask, session, request, g, send_from_directory
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 from flask_talisman import Talisman
 from flask_migrate import Migrate
+from flask_compress import Compress
 from config import config
 from models import db
 from logging_config import setup_logging
@@ -13,6 +14,7 @@ login_manager = LoginManager()
 csrf = CSRFProtect()
 talisman = Talisman()
 migrate = Migrate()
+compress = Compress()
 
 # Create logger instance
 logger = logging.getLogger(__name__)
@@ -33,6 +35,7 @@ def create_app(config_name=None):
     migrate.init_app(app, db)
     login_manager.init_app(app)
     csrf.init_app(app)
+    compress.init_app(app)
     
     # Initialize Flask-Mail
     from mail_utils import init_mail
@@ -96,11 +99,21 @@ def create_app(config_name=None):
 
     @app.after_request
     def after_request(response):
-        """Log completed requests."""
+        """Log completed requests and add caching headers."""
+        # Log non-static requests
         if hasattr(g, 'start_time') and g.start_time:
             from time import time
             duration = (time() - g.start_time) * 1000
             logger.debug(f"Response: {request.method} {request.path} -> {response.status_code} ({duration:.2f}ms)")
+        
+        # Add caching headers for static files
+        if request.endpoint == 'static' or request.path.startswith('/static/'):
+            # Cache static files for 1 year in production, 1 hour in development
+            max_age = 31536000 if config_name == 'production' else 3600
+            response.cache_control.max_age = max_age
+            response.cache_control.public = True
+            response.headers['X-Content-Type-Options'] = 'nosniff'
+        
         return response
 
     # Session security enhancements
