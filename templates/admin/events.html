@@ -40,6 +40,7 @@
                             <td>{{ 'Published' if event.is_published else 'Draft' }}</td>
                             <td>{{ event.get_registered_count() }}{% if event.max_capacity %} / {{ event.max_capacity }}{% endif %}</td>
                             <td>
+                                <a href="{{ url_for('admin.edit_event', event_id=event.id) }}" class="btn btn-ghost btn-sm">Edit</a>
                                 <a href="{{ url_for('events.detail', event_id=event.id) }}" class="btn btn-ghost btn-sm">View</a>
                                 <form method="POST" action="{{ url_for('admin.delete_event', event_id=event.id) }}" style="display: inline;" onsubmit="return confirm('Delete this event?');">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Event - Kizuna{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    <div class="page-header">
+        <div class="container">
+            <h1>Edit Event</h1>
+            <p>Update event details</p>
+        </div>
+    </div>
+
+    <div class="page-content">
+        <div class="container" style="max-width: 640px;">
+            <div class="card">
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-group">
+                        <label class="form-label" for="title">Event Title</label>
+                        <input type="text" id="title" name="title" class="form-input" value="{{ event.title }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="description">Description</label>
+                        <textarea id="description" name="description" class="form-input" rows="4">{{ event.description or '' }}</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="cas_type">CAS Type</label>
+                        <select id="cas_type" name="cas_type" class="form-input" required>
+                            <option value="">Select type...</option>
+                            <option value="Creativity" {% if event.cas_type == 'Creativity' %}selected{% endif %}>Creativity</option>
+                            <option value="Activity" {% if event.cas_type == 'Activity' %}selected{% endif %}>Activity</option>
+                            <option value="Service" {% if event.cas_type == 'Service' %}selected{% endif %}>Service</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="event_date">Date</label>
+                        <input type="date" id="event_date" name="event_date" class="form-input" value="{{ event.event_date.strftime('%Y-%m-%d') }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="location">Location</label>
+                        <input type="text" id="location" name="location" class="form-input" value="{{ event.location or '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="max_capacity">Maximum Capacity</label>
+                        <input type="number" id="max_capacity" name="max_capacity" class="form-input" min="1" value="{{ event.max_capacity or '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="club_id">Associated Club</label>
+                        <select id="club_id" name="club_id" class="form-input">
+                            <option value="">No club</option>
+                            {% for club in clubs %}
+                            <option value="{{ club.id }}" {% if event.club_id == club.id %}selected{% endif %}>{{ club.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="is_published" name="is_published" style="width: auto;" {% if event.is_published %}checked{% endif %}>
+                        <label for="is_published" style="font-size: 0.9rem; color: var(--text-muted);">Published</label>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary btn-lg">Save Changes</button>
+                        <a href="{{ url_for('admin.manage_events') }}" class="btn btn-secondary btn-lg">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
