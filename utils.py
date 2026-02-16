@@ -141,3 +141,51 @@ def validate_url(url, max_length=500):
         return False, "Invalid URL format"
     
     return True, url
+
+# Simple in-memory rate limiting (use Redis in production)
+_rate_limit_store = {}
+
+def check_rate_limit(key, max_requests=5, window_seconds=300):
+    """
+    Check if a rate limit has been exceeded.
+    Returns (allowed, remaining_seconds)
+    
+    Args:
+        key: Unique identifier (e.g., IP address or username)
+        max_requests: Maximum requests allowed in window
+        window_seconds: Time window in seconds
+    """
+    import time
+    
+    current_time = time.time()
+    window_start = current_time - window_seconds
+    
+    # Clean old entries
+    if key in _rate_limit_store:
+        _rate_limit_store[key] = [
+            timestamp for timestamp in _rate_limit_store[key]
+            if timestamp > window_start
+        ]
+    else:
+        _rate_limit_store[key] = []
+    
+    # Check if limit exceeded
+    if len(_rate_limit_store[key]) >= max_requests:
+        oldest = min(_rate_limit_store[key])
+        remaining = int(oldest + window_seconds - current_time)
+        return False, max(0, remaining)
+    
+    # Record this request
+    _rate_limit_store[key].append(current_time)
+    return True, 0
+
+
+def get_client_ip():
+    """Get client IP address from request"""
+    from flask import request
+    
+    # Check for X-Forwarded-For header (behind proxy)
+    if request.headers.get('X-Forwarded-For'):
+        return request.headers.get('X-Forwarded-For').split(',')[0].strip()
+    
+    return request.remote_addr
