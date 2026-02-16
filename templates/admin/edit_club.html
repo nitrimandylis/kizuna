@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Club - Kizuna{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    <div class="page-header">
+        <div class="container">
+            <h1>Edit Club</h1>
+            <p>Update club details</p>
+        </div>
+    </div>
+
+    <div class="page-content">
+        <div class="container" style="max-width: 640px;">
+            <div class="card">
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-group">
+                        <label class="form-label" for="name">Club Name</label>
+                        <input type="text" id="name" name="name" class="form-input" value="{{ club.name }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="description">Description</label>
+                        <textarea id="description" name="description" class="form-input" rows="4">{{ club.description or '' }}</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="meeting_day">Meeting Day</label>
+                        <select id="meeting_day" name="meeting_day" class="form-input">
+                            <option value="">Select day...</option>
+                            <option value="Monday" {% if club.meeting_day == 'Monday' %}selected{% endif %}>Monday</option>
+                            <option value="Tuesday" {% if club.meeting_day == 'Tuesday' %}selected{% endif %}>Tuesday</option>
+                            <option value="Wednesday" {% if club.meeting_day == 'Wednesday' %}selected{% endif %}>Wednesday</option>
+                            <option value="Thursday" {% if club.meeting_day == 'Thursday' %}selected{% endif %}>Thursday</option>
+                            <option value="Friday" {% if club.meeting_day == 'Friday' %}selected{% endif %}>Friday</option>
+                            <option value="Saturday" {% if club.meeting_day == 'Saturday' %}selected{% endif %}>Saturday</option>
+                            <option value="Sunday" {% if club.meeting_day == 'Sunday' %}selected{% endif %}>Sunday</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="meeting_time">Meeting Time</label>
+                        <input type="time" id="meeting_time" name="meeting_time" class="form-input" value="{{ club.meeting_time or '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="meeting_location">Meeting Location</label>
+                        <input type="text" id="meeting_location" name="meeting_location" class="form-input" value="{{ club.meeting_location or '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="leader_name">Club Leader Name</label>
+                        <input type="text" id="leader_name" name="leader_name" class="form-input" value="{{ club.leader_name or '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="leader_email">Club Leader Email</label>
+                        <input type="email" id="leader_email" name="leader_email" class="form-input" value="{{ club.leader_email or '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="website_url">Website URL</label>
+                        <input type="url" id="website_url" name="website_url" class="form-input" value="{{ club.website_url or '' }}" placeholder="https://">
+                    </div>
+                    
+                    <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="is_active" name="is_active" style="width: auto;" {% if club.is_active %}checked{% endif %}>
+                        <label for="is_active" style="font-size: 0.9rem; color: var(--text-muted);">Active</label>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary btn-lg">Save Changes</button>
+                        <a href="{{ url_for('admin.manage_clubs') }}" class="btn btn-secondary btn-lg">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Clubs - Kizuna{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    <div class="page-header">
+        <div class="container">
+            <h1>Manage Clubs</h1>
+            <p>View and manage all clubs</p>
+        </div>
+    </div>
+
+    <div class="page-content">
+        <div class="container">
+            <div class="admin-header">
+                <div></div>
+                <a href="{{ url_for('admin.create_club') }}" class="btn btn-primary">Create Club</a>
+            </div>
+            
+            {% if clubs.items %}
+            <div class="admin-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Meeting</th>
+                            <th>Leader</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for club in clubs.items %}
+                        <tr>
+                            <td>{{ club.name }}</td>
+                            <td>{{ club.meeting_day or '-' }}{% if club.meeting_time %} at {{ club.meeting_time }}{% endif %}</td>
+                            <td>{{ club.leader_name or '-' }}</td>
+                            <td>{{ 'Active' if club.is_active else 'Inactive' }}</td>
+                            <td>
+                                <a href="{{ url_for('admin.edit_club', club_id=club.id) }}" class="btn btn-ghost btn-sm">Edit</a>
+                                <a href="{{ url_for('clubs.detail', club_id=club.id) }}" class="btn btn-ghost btn-sm">View</a>
+                                <form method="POST" action="{{ url_for('admin.delete_club', club_id=club.id) }}" style="display: inline;" onsubmit="return confirm('Delete this club?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--primary);">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h3>No clubs yet</h3>
+                <p>Create your first club to get started.</p>
+                <a href="{{ url_for('admin.create_club') }}" class="btn btn-primary" style="margin-top: 1rem;">Create Club</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

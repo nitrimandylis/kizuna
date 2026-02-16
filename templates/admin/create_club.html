@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Create Club - Kizuna{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    <div class="page-header">
+        <div class="container">
+            <h1>Create Club</h1>
+            <p>Add a new club to the platform</p>
+        </div>
+    </div>
+
+    <div class="page-content">
+        <div class="container" style="max-width: 640px;">
+            <div class="card">
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-group">
+                        <label class="form-label" for="name">Club Name</label>
+                        <input type="text" id="name" name="name" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="description">Description</label>
+                        <textarea id="description" name="description" class="form-input" rows="4"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="meeting_day">Meeting Day</label>
+                        <select id="meeting_day" name="meeting_day" class="form-input">
+                            <option value="">Select day...</option>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="meeting_time">Meeting Time</label>
+                        <input type="time" id="meeting_time" name="meeting_time" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="meeting_location">Meeting Location</label>
+                        <input type="text" id="meeting_location" name="meeting_location" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="leader_name">Club Leader Name</label>
+                        <input type="text" id="leader_name" name="leader_name" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="leader_email">Club Leader Email</label>
+                        <input type="email" id="leader_email" name="leader_email" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="website_url">Website URL</label>
+                        <input type="url" id="website_url" name="website_url" class="form-input" placeholder="https://">
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary btn-lg">Create Club</button>
+                        <a href="{{ url_for('admin.manage_clubs') }}" class="btn btn-secondary btn-lg">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

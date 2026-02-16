@@ -51,6 +51,16 @@
                         <input type="number" id="max_capacity" name="max_capacity" class="form-input" min="1">
                     </div>
                     
+                    <div class="form-group">
+                        <label class="form-label" for="club_id">Associated Club</label>
+                        <select id="club_id" name="club_id" class="form-input">
+                            <option value="">No club</option>
+                            {% for club in clubs %}
+                            <option value="{{ club.id }}">{{ club.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
                     <div style="display: flex; gap: 1rem; margin-top: 2rem;">
                         <button type="submit" class="btn btn-primary btn-lg">Create Event</button>
                         <a href="{{ url_for('admin.manage_events') }}" class="btn btn-secondary btn-lg">Cancel</a>
