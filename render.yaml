@@ -3,7 +3,7 @@ services:
     name: kizuna
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: cd backend && flask db upgrade && gunicorn app:app
+    startCommand: cd backend && python run.py
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.0
