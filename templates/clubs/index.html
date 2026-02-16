@@ -89,8 +89,12 @@
             {% endif %}
             {% else %}
             <div class="empty-state">
+                <div class="empty-state-icon" aria-hidden="true">{% if search %}🔍{% else %}🏛️{% endif %}</div>
                 <h3>{% if search %}No clubs found{% else %}No clubs yet{% endif %}</h3>
-                <p>{% if search %}Try a different search term{% else %}Check back soon for club listings.{% endif %}</p>
+                <p>{% if search %}Try a different search term or browse all clubs.{% else %}Check back soon for club listings.{% endif %}</p>
+                {% if search or day %}
+                <a href="{{ url_for('clubs.index') }}" class="btn btn-primary">Clear Filters</a>
+                {% endif %}
             </div>
             {% endif %}
         </div>

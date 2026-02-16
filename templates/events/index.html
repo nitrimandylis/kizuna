@@ -108,8 +108,14 @@
             {% endif %}
             {% else %}
             <div class="empty-state">
+                <div class="empty-state-icon" aria-hidden="true">{% if search %}🔍{% else %}📅{% endif %}</div>
                 <h3>{% if search %}No events found{% else %}No events yet{% endif %}</h3>
-                <p>{% if search %}Try a different search term{% else %}Check back soon for upcoming activities.{% endif %}</p>
+                <p>{% if search %}Try a different search term or browse all events.{% else %}Check back soon for upcoming activities.{% endif %}</p>
+                {% if search %}
+                <a href="{{ url_for('events.index', type=selected_type, time=request.args.get('time', 'upcoming')) }}" class="btn btn-primary">Clear Search</a>
+                {% else %}
+                <a href="{{ url_for('events.index', time='past') }}" class="btn btn-secondary">View Past Events</a>
+                {% endif %}
             </div>
             {% endif %}
         </div>
