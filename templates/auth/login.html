@@ -15,7 +15,7 @@
             <form method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="form-group">
-                    <label class="form-label" for="username">Username</label>
+                    <label class="form-label" for="username">Username or Email</label>
                     <input type="text" id="username" name="username" class="form-input" required autofocus>
                 </div>
 
@@ -24,9 +24,12 @@
                     <input type="password" id="password" name="password" class="form-input" required>
                 </div>
 
-                <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
-                    <input type="checkbox" id="remember" name="remember" style="width: auto;">
-                    <label for="remember" style="font-size: 0.9rem; color: var(--text-muted);">Remember me</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="remember" name="remember" style="width: auto;">
+                        <label for="remember" style="font-size: 0.9rem; color: var(--text-muted);">Remember me</label>
+                    </div>
+                    <a href="{{ url_for('auth.forgot_password') }}" style="font-size: 0.9rem; color: var(--primary);">Forgot password?</a>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-full btn-lg">Sign In</button>
