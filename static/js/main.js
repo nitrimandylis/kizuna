@@ -1,23 +1,78 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Mobile navigation toggle
+    // Skip link focus management
+    const skipLink = document.querySelector('.skip-link');
+    const mainContent = document.getElementById('main-content');
+    
+    if (skipLink && mainContent) {
+        skipLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            mainContent.focus();
+        });
+    }
+    
+    // Mobile navigation toggle with accessibility
     const navToggle = document.getElementById('navToggle');
     const navMenu = document.getElementById('navMenu');
     
     if (navToggle && navMenu) {
         navToggle.addEventListener('click', function() {
-            navMenu.classList.toggle('active');
+            const isOpen = navMenu.classList.toggle('active');
+            navToggle.setAttribute('aria-expanded', isOpen);
+        });
+        
+        // Close menu on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+                navMenu.classList.remove('active');
+                navToggle.setAttribute('aria-expanded', 'false');
+                navToggle.focus();
+            }
         });
     }
     
-    // Auto-dismiss alerts
+    // Set active nav link based on current page
+    const navLinks = document.querySelectorAll('.nav-link');
+    const currentPath = window.location.pathname;
+    
+    navLinks.forEach(function(link) {
+        if (link.getAttribute('href') === currentPath) {
+            link.classList.add('active');
+            link.setAttribute('aria-current', 'page');
+        }
+    });
+    
+    // Enhanced alert handling with close buttons
+    const alertContainer = document.querySelector('.alert-container');
     const alerts = document.querySelectorAll('.alert');
+    
     alerts.forEach(function(alert) {
+        const closeBtn = alert.querySelector('.alert-close');
+        
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                alert.style.animation = 'slideOut 0.3s ease forwards';
+                setTimeout(function() {
+                    alert.remove();
+                    if (alertContainer && alertContainer.children.length === 0) {
+                        alertContainer.remove();
+                    }
+                }, 300);
+            });
+        }
+        
+        // Auto-dismiss after 5 seconds
         setTimeout(function() {
-            alert.style.opacity = '0';
-            alert.style.transition = 'opacity 0.3s';
-            setTimeout(function() {
-                alert.remove();
-            }, 300);
+            if (alert && alert.parentNode) {
+                alert.style.animation = 'slideOut 0.3s ease forwards';
+                setTimeout(function() {
+                    if (alert.parentNode) {
+                        alert.remove();
+                        if (alertContainer && alertContainer.children.length === 0) {
+                            alertContainer.remove();
+                        }
+                    }
+                }, 300);
+            }
         }, 5000);
     });
     
@@ -123,19 +178,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (isOtherMonth) classes.push('other-month');
                 if (isToday) classes.push('today');
                 
-                html += '<div class="' + classes.join(' ') + '" data-date="' + dateStr + '">';
+                const eventCount = eventsByDate[dateStr] ? eventsByDate[dateStr].length : 0;
+                
+                html += '<div class="' + classes.join(' ') + '" data-date="' + dateStr + '" tabindex="0" role="button" aria-label="' + (dateStr ? new Date(dateStr).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) : '') + (eventCount ? ', ' + eventCount + ' event' + (eventCount > 1 ? 's' : '') : '') + '">';
                 html += '<div class="calendar-day-header">';
                 html += '<span class="calendar-day-number">' + dayNumber + '</span>';
+                if (eventCount > 0) {
+                    html += '<span class="event-count" aria-hidden="true">' + eventCount + '</span>';
+                }
                 html += '</div>';
                 html += '<div class="calendar-day-content">';
                 
-                // Add events for this date
+                // Add events for this date (max 3 visible)
                 if (dateStr && eventsByDate[dateStr]) {
-                    eventsByDate[dateStr].forEach(function(event) {
+                    const visibleEvents = eventsByDate[dateStr].slice(0, 3);
+                    visibleEvents.forEach(function(event) {
                         html += '<div class="calendar-event cas-' + event.cas_type + '" title="' + event.title + '">';
                         html += event.title;
                         html += '</div>';
                     });
+                    if (eventsByDate[dateStr].length > 3) {
+                        html += '<div class="calendar-more">+' + (eventsByDate[dateStr].length - 3) + ' more</div>';
+                    }
                 }
                 
                 html += '</div>';
@@ -190,6 +254,19 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
+        // Keyboard navigation for calendar
+        document.addEventListener('keydown', function(e) {
+            if (document.activeElement && document.activeElement.classList.contains('calendar-day')) {
+                if (e.key === 'ArrowLeft') {
+                    currentDate.setMonth(currentDate.getMonth() - 1);
+                    loadCalendar();
+                } else if (e.key === 'ArrowRight') {
+                    currentDate.setMonth(currentDate.getMonth() + 1);
+                    loadCalendar();
+                }
+            }
+        });
+        
         // Initial load
         loadCalendar();
     }
@@ -219,3 +296,8 @@ function resetButtonState(btn) {
         btn.disabled = false;
     }
 }
+
+// Add slideOut animation
+const style = document.createElement('style');
+style.textContent = '@keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }';
+document.head.appendChild(style);

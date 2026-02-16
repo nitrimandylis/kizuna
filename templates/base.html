@@ -7,32 +7,40 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/kizuna-logo-small.svg') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description" content="Kizuna - IBDP community platform for CAS experiences, clubs, and events">
 </head>
 <body>
-    <nav class="navbar">
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
         <div class="nav-container">
-            <a href="{{ url_for('main.index') }}" class="navbar-brand">
-                <img src="{{ url_for('static', filename='images/kizuna-logo.svg') }}" alt="Kizuna" class="logo-main">
+            <a href="{{ url_for('main.index') }}" class="navbar-brand" aria-label="Kizuna home">
+                <img src="{{ url_for('static', filename='images/kizuna-logo.svg') }}" alt="Kizuna" class="logo-main" width="120" height="36">
             </a>
-            <button class="nav-toggle" id="navToggle">
+            <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu" aria-label="Toggle navigation menu">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
-            <ul class="nav-menu" id="navMenu">
-                <li><a href="{{ url_for('main.index') }}" class="nav-link">Home</a></li>
-                <li><a href="{{ url_for('main.about') }}" class="nav-link">About</a></li>
-                <li><a href="{{ url_for('clubs.index') }}" class="nav-link">Clubs</a></li>
-                <li><a href="{{ url_for('events.index') }}" class="nav-link">Events</a></li>
+            <ul class="nav-menu" id="navMenu" role="menubar">
+                <li role="none"><a href="{{ url_for('main.index') }}" class="nav-link" role="menuitem">Home</a></li>
+                <li role="none"><a href="{{ url_for('main.about') }}" class="nav-link" role="menuitem">About</a></li>
+                <li role="none"><a href="{{ url_for('clubs.index') }}" class="nav-link" role="menuitem">Clubs</a></li>
+                <li role="none"><a href="{{ url_for('events.index') }}" class="nav-link" role="menuitem">Events</a></li>
                 {% if current_user.is_authenticated %}
-                    <li><a href="{{ url_for('profile.index') }}" class="nav-link">Profile</a></li>
+                    <li role="none"><a href="{{ url_for('profile.index') }}" class="nav-link" role="menuitem">Profile</a></li>
                     {% if current_user.is_admin %}
-                    <li><a href="{{ url_for('admin.dashboard') }}" class="nav-link">Admin</a></li>
+                    <li role="none"><a href="{{ url_for('admin.dashboard') }}" class="nav-link" role="menuitem">Admin</a></li>
                     {% endif %}
-                    <li><a href="{{ url_for('auth.logout') }}" class="nav-link">Logout</a></li>
+                    <li role="none">
+                        <a href="{{ url_for('auth.logout') }}" class="nav-link" role="menuitem">
+                            <span class="nav-icon" aria-hidden="true">→</span> Logout
+                        </a>
+                    </li>
                 {% else %}
-                    <li><a href="{{ url_for('auth.login') }}" class="nav-link">Login</a></li>
-                    <li><a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Join</a></li>
+                    <li role="none"><a href="{{ url_for('auth.login') }}" class="nav-link" role="menuitem">Login</a></li>
+                    <li role="none"><a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm" role="menuitem">Join</a></li>
                 {% endif %}
             </ul>
         </div>
@@ -40,21 +48,27 @@
 
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
+        <div class="alert-container" role="region" aria-label="Notifications">
             {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">
-                {{ message }}
+            <div class="alert alert-{{ category }}" role="alert">
+                <span class="alert-icon" aria-hidden="true">
+                    {% if category == 'success' %}✓{% elif category == 'error' %}✕{% elif category == 'warning' %}⚠{% else %}ℹ{% endif %}
+                </span>
+                <span class="alert-message">{{ message }}</span>
+                <button class="alert-close" aria-label="Close notification">×</button>
             </div>
             {% endfor %}
+        </div>
         {% endif %}
     {% endwith %}
 
     <div class="page-wrapper">
-        <main>
+        <main id="main-content" tabindex="-1">
             {% block content %}{% endblock %}
         </main>
-        <footer class="footer">
+        <footer class="footer" role="contentinfo">
             <div class="footer-content">
-                <div class="footer-brand">Kizuna Initiative</div>
+                <div class="footer-brand">© <span id="current-year">2024</span> Kizuna Initiative</div>
                 <div class="footer-links">
                     <a href="{{ url_for('main.about') }}">About</a>
                     <a href="{{ url_for('clubs.index') }}">Clubs</a>
@@ -66,5 +80,9 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Set current year in footer
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
 </body>
 </html>
