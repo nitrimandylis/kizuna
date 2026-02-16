@@ -29,7 +29,26 @@
                 {% if event.max_capacity %}
                 <div class="detail-section">
                     <div class="detail-label">Capacity</div>
-                    <div class="detail-value">{{ event.get_registered_count() }} / {{ event.max_capacity }} registered</div>
+                    <div class="detail-value">
+                        {% set registered = event.get_registered_count() %}
+                        {% set remaining = event.max_capacity - registered %}
+                        
+                        {% if remaining <= 0 %}
+                            <span class="capacity-full">Full ({{ registered }}/{{ event.max_capacity }})</span>
+                        {% elif remaining <= 5 %}
+                            <span class="capacity-low">{{ remaining }} spots left ({{ registered }}/{{ event.max_capacity }})</span>
+                        {% else %}
+                            {{ registered }}/{{ event.max_capacity }} registered
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Capacity progress bar -->
+                    <div class="capacity-bar">
+                        <div class="capacity-bar-fill" style="width: {{ (registered / event.max_capacity * 100)|round }}%; 
+                            {% if remaining <= 0 %}background: var(--primary);
+                            {% elif remaining <= 5 %}background: var(--warning);
+                            {% else %}background: var(--success);{% endif %}"></div>
+                    </div>
                 </div>
                 {% endif %}
                 
@@ -40,26 +59,40 @@
                 </div>
                 {% endif %}
                 
+                {% if event.club %}
+                <div class="detail-section">
+                    <div class="detail-label">Organized by</div>
+                    <div class="detail-value">
+                        <a href="{{ url_for('clubs.detail', club_id=event.club.id) }}">{{ event.club.name }}</a>
+                    </div>
+                </div>
+                {% endif %}
+                
                 {% if current_user.is_authenticated %}
                 <div class="detail-section" style="padding-top: 1.5rem; border-top: 1px solid var(--border);">
                     {% if is_registered %}
+                    <div class="registration-status registered">
+                        <span>You are registered for this event</span>
+                    </div>
                     <form method="POST" action="{{ url_for('events.unregister', event_id=event.id) }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit" class="btn btn-secondary btn-full">Cancel Registration</button>
                     </form>
-                    {% elif not event.is_full() %}
+                    {% elif event.is_full() %}
+                    <div class="registration-status full">
+                        <span>This event is at full capacity</span>
+                    </div>
+                    {% else %}
                     <form method="POST" action="{{ url_for('events.register', event_id=event.id) }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="btn btn-primary btn-full btn-lg">Register</button>
+                        <button type="submit" class="btn btn-primary btn-full btn-lg">Register Now</button>
                     </form>
-                    {% else %}
-                    <p style="color: var(--text-muted); text-align: center;">This event is at full capacity.</p>
                     {% endif %}
                 </div>
                 {% else %}
                 <div class="detail-section" style="padding-top: 1.5rem; border-top: 1px solid var(--border);">
                     <p style="color: var(--text-muted); text-align: center; margin-bottom: 1rem;">Sign in to register for this event</p>
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-full">Sign In</a>
+                    <a href="{{ url_for('auth.login', next=request.path) }}" class="btn btn-primary btn-full">Sign In</a>
                 </div>
                 {% endif %}
             </div>

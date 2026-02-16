@@ -2,7 +2,7 @@ import logging
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from models import db, Event, EventRegistration
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 
 events_bp = Blueprint('events', __name__, url_prefix='/events')
 logger = logging.getLogger(__name__)
@@ -51,14 +51,22 @@ def detail(event_id):
 def register(event_id):
     event = Event.query.get_or_404(event_id)
 
+    # Check if already registered
     if EventRegistration.query.filter_by(event_id=event_id, user_id=current_user.id).first():
         flash('You are already registered for this event', 'warning')
         return redirect(url_for('events.detail', event_id=event_id))
 
-    if event.is_full():
-        logger.warning(f"Registration attempt for full event: '{event.title}' (ID: {event_id}) by user: {current_user.username}")
-        flash('This event is at full capacity', 'error')
-        return redirect(url_for('events.detail', event_id=event_id))
+    # Check capacity with database-level count for accuracy
+    if event.max_capacity:
+        current_count = db.session.query(func.count(EventRegistration.id)).filter(
+            EventRegistration.event_id == event_id,
+            EventRegistration.status == 'confirmed'
+        ).scalar()
+        
+        if current_count >= event.max_capacity:
+            logger.warning(f"Registration attempt for full event: '{event.title}' (ID: {event_id}) by user: {current_user.username}")
+            flash('This event is at full capacity', 'error')
+            return redirect(url_for('events.detail', event_id=event_id))
 
     registration = EventRegistration(
         event_id=event_id,

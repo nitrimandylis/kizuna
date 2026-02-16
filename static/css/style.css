@@ -1283,3 +1283,51 @@ main {
         gap: 0.5rem;
     }
 }
+
+/* ═════════════════════════════════════════════════════════════════════════
+   EVENT CAPACITY INDICATORS
+   ═════════════════════════════════════════════════════════════════════════ */
+
+.capacity-full {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.capacity-low {
+    color: var(--warning);
+    font-weight: 600;
+}
+
+.capacity-bar {
+    height: 6px;
+    background: var(--navy-light);
+    border-radius: 3px;
+    margin-top: 0.5rem;
+    overflow: hidden;
+}
+
+.capacity-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.registration-status {
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.registration-status.registered {
+    background: rgba(52, 211, 153, 0.1);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    color: var(--success);
+}
+
+.registration-status.full {
+    background: rgba(254, 67, 89, 0.1);
+    border: 1px solid rgba(254, 67, 89, 0.3);
+    color: var(--primary-light);
+}
