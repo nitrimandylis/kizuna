@@ -10,7 +10,10 @@
         <p>Something went wrong on our end. We're working to fix it.</p>
         <div class="error-actions">
             <a href="{{ url_for('main.index') }}" class="btn btn-primary">Go Home</a>
-            <a href="mailto:kizuna@cgs.gr" class="btn btn-secondary">Contact Support</a>
+            <a href="mailto:kizuna@cgs.gr?subject=500%20Server%20Error%20Report&body=I%20encountered%20a%20500%20server%20error%20on%20Kizuna.%0A%0APage%3A%20%0ATime%3A%20%0AAdditional%20details%3A%20" class="btn btn-secondary">Report Issue</a>
+        </div>
+        <div class="error-contact">
+            <p>Need help? Contact us at <a href="mailto:kizuna@cgs.gr">kizuna@cgs.gr</a></p>
         </div>
     </div>
 </div>

@@ -5,9 +5,17 @@
 {% block content %}
 <div class="standard-page">
     <div class="error-page">
-        <div class="error-code">403</div>
+        <div class="error-code pulse">403</div>
         <h1>Access Denied</h1>
         <p>You don't have permission to access this page.</p>
+        <div class="error-permissions">
+            <p>This page may require:</p>
+            <ul>
+                <li><strong>Login</strong> — You need to be signed in to view this content</li>
+                <li><strong>Admin access</strong> — This area is restricted to administrators</li>
+                <li><strong>Club membership</strong> — You may need to join a club first</li>
+            </ul>
+        </div>
         <div class="error-actions">
             <a href="{{ url_for('main.index') }}" class="btn btn-primary">Go Home</a>
             {% if not current_user.is_authenticated %}
