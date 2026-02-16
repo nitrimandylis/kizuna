@@ -28,6 +28,42 @@
                 </article>
                 {% endfor %}
             </div>
+
+            <!-- Pagination -->
+            {% if clubs.pages > 1 %}
+            <nav class="pagination">
+                {% if clubs.has_prev %}
+                <a href="{{ url_for('clubs.index', page=clubs.prev_num) }}" class="pagination-btn">
+                    ← Previous
+                </a>
+                {% else %}
+                <span class="pagination-btn disabled">← Previous</span>
+                {% endif %}
+
+                <div class="pagination-numbers">
+                    {% for page_num in clubs.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                        {% if page_num %}
+                            {% if page_num == clubs.page %}
+                            <span class="pagination-num active">{{ page_num }}</span>
+                            {% else %}
+                            <a href="{{ url_for('clubs.index', page=page_num) }}" class="pagination-num">{{ page_num }}</a>
+                            {% endif %}
+                        {% else %}
+                        <span class="pagination-ellipsis">…</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                {% if clubs.has_next %}
+                <a href="{{ url_for('clubs.index', page=clubs.next_num) }}" class="pagination-btn">
+                    Next →
+                </a>
+                {% else %}
+                <span class="pagination-btn disabled">Next →</span>
+                {% endif %}
+            </nav>
+            <p class="pagination-info">Showing {{ clubs.items|length }} of {{ clubs.total }} clubs</p>
+            {% endif %}
             {% else %}
             <div class="empty-state">
                 <h3>No clubs yet</h3>

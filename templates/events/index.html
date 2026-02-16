@@ -13,6 +13,14 @@
 
     <div class="page-content">
         <div class="container">
+            <!-- Filter tabs -->
+            <div class="filter-tabs">
+                <a href="{{ url_for('events.index') }}" class="filter-tab {% if not selected_type %}active{% endif %}">All</a>
+                <a href="{{ url_for('events.index', type='Creativity') }}" class="filter-tab {% if selected_type == 'Creativity' %}active{% endif %}">Creativity</a>
+                <a href="{{ url_for('events.index', type='Activity') }}" class="filter-tab {% if selected_type == 'Activity' %}active{% endif %}">Activity</a>
+                <a href="{{ url_for('events.index', type='Service') }}" class="filter-tab {% if selected_type == 'Service' %}active{% endif %}">Service</a>
+            </div>
+
             {% if events.items %}
             <div class="cards-grid">
                 {% for event in events.items %}
@@ -28,6 +36,42 @@
                 </article>
                 {% endfor %}
             </div>
+
+            <!-- Pagination -->
+            {% if events.pages > 1 %}
+            <nav class="pagination">
+                {% if events.has_prev %}
+                <a href="{{ url_for('events.index', page=events.prev_num, type=selected_type) }}" class="pagination-btn">
+                    ← Previous
+                </a>
+                {% else %}
+                <span class="pagination-btn disabled">← Previous</span>
+                {% endif %}
+
+                <div class="pagination-numbers">
+                    {% for page_num in events.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                        {% if page_num %}
+                            {% if page_num == events.page %}
+                            <span class="pagination-num active">{{ page_num }}</span>
+                            {% else %}
+                            <a href="{{ url_for('events.index', page=page_num, type=selected_type) }}" class="pagination-num">{{ page_num }}</a>
+                            {% endif %}
+                        {% else %}
+                        <span class="pagination-ellipsis">…</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                {% if events.has_next %}
+                <a href="{{ url_for('events.index', page=events.next_num, type=selected_type) }}" class="pagination-btn">
+                    Next →
+                </a>
+                {% else %}
+                <span class="pagination-btn disabled">Next →</span>
+                {% endif %}
+            </nav>
+            <p class="pagination-info">Showing {{ events.items|length }} of {{ events.total }} events</p>
+            {% endif %}
             {% else %}
             <div class="empty-state">
                 <h3>No events yet</h3>
