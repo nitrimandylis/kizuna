@@ -1,116 +1,79 @@
-# Kizuna Initiative Platform
+# Kizuna Platform
 
-## Overview
-Kizuna Initiative is a comprehensive community hub platform designed for the IBDP student community at CGS Athens.
+A community platform for IBDP students to coordinate CAS experiences, clubs, and events.
 
-### Branding
-- Primary Color: #fe4359 (Vibrant Red)
-- Secondary Color: #1a1c37 (Deep Dark Blue)
+## Tech Stack
 
-## Features
+- **Backend:** Flask, SQLAlchemy, Flask-Login
+- **Database:** PostgreSQL (Supabase)
+- **Frontend:** Jinja2 templates, CSS, JavaScript
+- **Deployment:** Render
 
-### Public Features
-- Home page with hero section and featured events
-- About page for initiative information
-- Clubs directory with details
-- CAS Events system (Creativity/Activity/Service)
-- Event filtering and search
-- Event registration with capacity tracking
-- Newsletter subscription
+## Project Structure
 
-### User Features
-- User registration and login
-- Event registration/unregistration
-- Newsletter management
-- Secure session management
-- Password reset functionality
-
-### Admin Features
-- Admin dashboard with statistics
-- Full event CRUD (Create, Read, Update, Delete)
-- Club management CRUD
-- User management
-- Participant tracking and management
-- Attendance status updates
-- Capacity monitoring
-- Event publishing/unpublishing
+```
+kizuna/
+├── app.py              # Flask app factory
+├── wsgi.py             # WSGI entry point for production
+├── config.py           # Configuration settings
+├── models.py           # Database models
+├── utils.py            # Utility functions
+├── mail.py             # Email utilities
+├── logger.py           # Logging configuration
+├── routes/             # Route blueprints
+│   ├── auth.py         # Authentication routes
+│   ├── events.py       # Event routes
+│   ├── clubs.py        # Club routes
+│   ├── profile.py      # User profile routes
+│   ├── admin.py        # Admin routes
+│   └── main.py         # Main routes
+├── templates/          # Jinja2 templates
+├── static/             # CSS, JS, images
+├── migrations/         # Database migrations
+├── requirements.txt    # Python dependencies
+└── render.yaml         # Render deployment config
+```
 
 ## Quick Start
 
-### Prerequisites
-- Python 3.11+
-- pip
-- Virtual environment
-- PostgreSQL (for production)
+```bash
+# Install dependencies
+pip install -r requirements.txt
 
-### Installation
+# Set up environment
+cp .env.example .env
 
-1. Clone the repository
+# Run database migrations
+flask db upgrade
 
-2. Create virtual environment:
-   python -m venv venv
-   source venv/bin/activate
-
-3. Install dependencies:
-   pip install -r requirements.txt
-
-4. Set up environment variables:
-   cp .env.example .env
-   Edit .env with your configuration
-
-5. Initialize database:
-   flask db init
-   flask db migrate -m "Initial migration"
-   flask db upgrade
-
-6. Run development server:
-   python app.py
+# Start development server
+python app.py
+```
 
 Visit http://localhost:5001
 
-## Database Migrations
-
-This project uses Flask-Migrate for database migrations:
-
-- Initialize: flask db init
-- Create migration: flask db migrate -m "Description"
-- Apply migrations: flask db upgrade
-- Rollback: flask db downgrade
-
-## Security Features
-
-- Password hashing with Werkzeug
-- Session-based authentication
-- CSRF protection
-- Rate limiting on auth routes
-- Input validation and sanitization
-- SQL injection prevention (SQLAlchemy)
-- XSS prevention
-- Secure session cookies (production)
-- Content Security Policy headers
-- HSTS (HTTP Strict Transport Security)
-
 ## Deployment
 
-### Docker
-docker-compose up -d
+### Render + Supabase
 
-### Render.com
-1. Push to GitHub
-2. Create new Web Service on Render
-3. Connect repository
-4. Set environment variables
+1. Create a Supabase project and get the database connection string
+2. Push this repo to GitHub
+3. Create a new Web Service on Render (connect GitHub repo)
+4. Set environment variables:
+   - `DATABASE_URL` - Supabase connection string
+   - `SECRET_KEY` - Random secret key
 5. Deploy!
 
-### Heroku
-1. heroku create kizuna-platform
-2. heroku addons:create heroku-postgresql
-3. git push heroku main
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `SECRET_KEY` | Flask secret key for sessions |
+| `MAIL_SERVER` | SMTP server (optional) |
+| `MAIL_USERNAME` | SMTP username (optional) |
+| `MAIL_PASSWORD` | SMTP password (optional) |
 
 ## License
 
-Kizuna Initiative - CGS Athens Community Hub
-
----
-
-Built for connecting the IBDP community.
+Kizuna Initiative - CGS Athens

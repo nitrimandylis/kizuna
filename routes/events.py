@@ -120,7 +120,7 @@ def register(event_id):
     
     # Send confirmation email
     try:
-        from mail_utils import send_event_registration_email
+        from mail import send_event_registration_email
         send_event_registration_email(current_user, event)
     except Exception as e:
         logger.error(f"Failed to send registration email: {e}")

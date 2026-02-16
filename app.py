@@ -8,7 +8,7 @@ from flask_migrate import Migrate
 from flask_compress import Compress
 from config import config
 from models import db
-from logging_config import setup_logging
+from logger import setup_logging
 
 login_manager = LoginManager()
 csrf = CSRFProtect()
@@ -38,7 +38,7 @@ def create_app(config_name=None):
     compress.init_app(app)
     
     # Initialize Flask-Mail
-    from mail_utils import init_mail
+    from mail import init_mail
     init_mail(app)
     
     # Configure Talisman for security headers

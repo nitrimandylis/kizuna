@@ -80,7 +80,7 @@ def register():
         logger.info(f"New user registered: {username} ({email}) from IP: {ip}")
         
         # Send verification email
-        from mail_utils import send_verification_email
+        from mail import send_verification_email
         result = send_verification_email(user, token)
         
         if isinstance(result, str):
@@ -140,7 +140,7 @@ def resend_verification():
             db.session.add(verification_token)
             db.session.commit()
             
-            from mail_utils import send_verification_email
+            from mail import send_verification_email
             result = send_verification_email(user, token)
             
             if isinstance(result, str):
@@ -250,7 +250,7 @@ def forgot_password():
             
             logger.info(f"Password reset token created for user: {user.username} ({email})")
             
-            from mail_utils import send_password_reset_email
+            from mail import send_password_reset_email
             result = send_password_reset_email(user, token)
             
             if is_ajax:

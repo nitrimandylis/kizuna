@@ -34,6 +34,7 @@ Thumbs.db
 .env.*.local
 
 # Logs
+logs/
 *.log
 
 # Testing
@@ -47,12 +48,6 @@ dist/
 build/
 *.egg-info/
 
-# Deployment
-.env.production
-
-# Logs directory
-logs/
-*.log
-
-# Migrations
-migrations/
+# Minified files (generated)
+static/css/*.min.css
+static/js/*.min.js
