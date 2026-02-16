@@ -1,4 +1,5 @@
 import logging
+from datetime import date
 from flask import Blueprint, render_template, request, redirect, url_for, flash, make_response
 from flask_login import login_required, current_user
 from models import db, Event, EventRegistration
@@ -12,12 +13,20 @@ def index():
     page = request.args.get('page', 1, type=int)
     cas_type = request.args.get('type')
     search = request.args.get('q', '').strip()
+    time_filter = request.args.get('time', 'upcoming')
 
     query = Event.query.filter_by(is_published=True)
     
     # Filter by CAS type
     if cas_type:
         query = query.filter_by(cas_type=cas_type)
+    
+    # Filter by time (upcoming/past)
+    today = date.today()
+    if time_filter == 'past':
+        query = query.filter(Event.event_date < today)
+    else:
+        query = query.filter(Event.event_date >= today)
     
     # Search functionality
     if search:

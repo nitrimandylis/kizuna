@@ -1,4 +1,38 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // View toggle functionality
+    const cardsGrid = document.querySelector('.cards-grid');
+    const viewToggleBtns = document.querySelectorAll('.view-toggle-btn');
+    
+    if (cardsGrid && viewToggleBtns.length > 0) {
+        const savedView = localStorage.getItem('eventsViewPreference') || 'grid';
+        
+        if (savedView === 'list') {
+            cardsGrid.classList.add('list-view');
+            viewToggleBtns.forEach(function(btn) {
+                btn.classList.toggle('active', btn.dataset.view === 'list');
+            });
+        }
+        
+        viewToggleBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const view = btn.dataset.view;
+                
+                viewToggleBtns.forEach(function(b) {
+                    b.classList.remove('active');
+                });
+                btn.classList.add('active');
+                
+                if (view === 'list') {
+                    cardsGrid.classList.add('list-view');
+                } else {
+                    cardsGrid.classList.remove('list-view');
+                }
+                
+                localStorage.setItem('eventsViewPreference', view);
+            });
+        });
+    }
+    
     // Skip link focus management
     const skipLink = document.querySelector('.skip-link');
     const mainContent = document.getElementById('main-content');

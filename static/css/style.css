@@ -1234,6 +1234,86 @@ main {
     color: var(--text-muted);
 }
 
+.view-controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}
+
+.view-toggle {
+    display: flex;
+    gap: 0.25rem;
+    background: var(--navy-light);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.25rem;
+}
+
+.view-toggle-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.view-toggle-btn:hover {
+    color: var(--text);
+}
+
+.view-toggle-btn.active {
+    background: var(--primary);
+    color: white;
+}
+
+.cards-grid.list-view {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.list-view .card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 0 1.5rem;
+    align-items: center;
+}
+
+.list-view .card .tag {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    align-self: start;
+    margin-top: 0.25rem;
+}
+
+.list-view .card h3 {
+    grid-column: 2;
+    grid-row: 1;
+    margin-bottom: 0.25rem;
+}
+
+.list-view .card p {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.list-view .card .card-meta {
+    grid-column: 3;
+    grid-row: 1 / 3;
+    text-align: right;
+    margin-top: 0;
+}
+
+.list-view .card .btn {
+    grid-column: 2;
+    grid-row: 3;
+    margin-top: 0.75rem;
+    justify-self: start;
+}
+
 @media (max-width: 768px) {
     .search-form {
         flex-direction: column;
@@ -1241,6 +1321,37 @@ main {
     
     .search-form .btn {
         width: 100%;
+    }
+    
+    .list-view .card {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto auto;
+    }
+    
+    .list-view .card .tag {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    
+    .list-view .card h3 {
+        grid-column: 1;
+        grid-row: 2;
+    }
+    
+    .list-view .card p {
+        grid-column: 1;
+        grid-row: 3;
+    }
+    
+    .list-view .card .card-meta {
+        grid-column: 1;
+        grid-row: 4;
+        text-align: left;
+    }
+    
+    .list-view .card .btn {
+        grid-column: 1;
+        grid-row: 5;
     }
 }
 
