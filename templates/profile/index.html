@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - Kizuna{% endblock %}
+
+{% block content %}
+<div class="standard-page">
+    <div class="page-header">
+        <div class="container">
+            <h1>My Profile</h1>
+            <p>Manage your account and view your registrations</p>
+        </div>
+    </div>
+
+    <div class="page-content">
+        <div class="container">
+            <div class="profile-grid">
+                <!-- Profile Info -->
+                <div class="profile-card">
+                    <h2>Account Information</h2>
+                    <div class="profile-info">
+                        <div class="info-row">
+                            <span class="info-label">Username</span>
+                            <span class="info-value">{{ current_user.username }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Email</span>
+                            <span class="info-value">
+                                {{ current_user.email }}
+                                {% if current_user.email_verified %}
+                                <span class="badge badge-success">Verified</span>
+                                {% else %}
+                                <span class="badge badge-warning">Unverified</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Member since</span>
+                            <span class="info-value">{{ current_user.created_at.strftime('%B %d, %Y') }}</span>
+                        </div>
+                    </div>
+                    <div class="profile-actions">
+                        <a href="{{ url_for('profile.edit') }}" class="btn btn-secondary">Edit Profile</a>
+                        <a href="{{ url_for('profile.change_password') }}" class="btn btn-secondary">Change Password</a>
+                    </div>
+                </div>
+
+                <!-- Registered Events -->
+                <div class="profile-card">
+                    <h2>My Event Registrations</h2>
+                    {% if registrations.items %}
+                    <div class="registrations-list">
+                        {% for reg in registrations.items %}
+                        <div class="registration-item">
+                            <div class="registration-event">
+                                <a href="{{ url_for('events.detail', event_id=reg.event.id) }}">{{ reg.event.title }}</a>
+                                <span class="tag cas-{{ reg.event.cas_type|lower }}">{{ reg.event.cas_type }}</span>
+                            </div>
+                            <div class="registration-meta">
+                                <span>{{ reg.event.event_date.strftime('%b %d, %Y') }}</span>
+                                <span class="status-{{ reg.status }}">{{ reg.status.title() }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if registrations.pages > 1 %}
+                    <nav class="pagination">
+                        {% if registrations.has_prev %}
+                        <a href="{{ url_for('profile.index', page=registrations.prev_num) }}" class="pagination-btn">Previous</a>
+                        {% endif %}
+                        
+                        <span class="pagination-info">Page {{ registrations.page }} of {{ registrations.pages }}</span>
+                        
+                        {% if registrations.has_next %}
+                        <a href="{{ url_for('profile.index', page=registrations.next_num) }}" class="pagination-btn">Next</a>
+                        {% endif %}
+                    </nav>
+                    {% endif %}
+                    
+                    {% else %}
+                    <div class="empty-state">
+                        <p>You haven't registered for any events yet.</p>
+                        <a href="{{ url_for('events.index') }}" class="btn btn-primary">Browse Events</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

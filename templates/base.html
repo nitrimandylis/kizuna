@@ -25,6 +25,7 @@
                 <li><a href="{{ url_for('clubs.index') }}" class="nav-link">Clubs</a></li>
                 <li><a href="{{ url_for('events.index') }}" class="nav-link">Events</a></li>
                 {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('profile.index') }}" class="nav-link">Profile</a></li>
                     {% if current_user.is_admin %}
                     <li><a href="{{ url_for('admin.dashboard') }}" class="nav-link">Admin</a></li>
                     {% endif %}
