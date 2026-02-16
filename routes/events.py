@@ -39,7 +39,17 @@ def index():
         query = query.filter(search_filter)
 
     events = query.order_by(Event.event_date.desc()).paginate(page=page, per_page=20)
-    return render_template('events/index.html', events=events, selected_type=cas_type, search=search)
+    
+    registered_event_ids = set()
+    if current_user.is_authenticated:
+        registered_event_ids = set(
+            r.event_id for r in EventRegistration.query.filter_by(
+                user_id=current_user.id,
+                status='confirmed'
+            ).all()
+        )
+    
+    return render_template('events/index.html', events=events, selected_type=cas_type, search=search, registered_event_ids=registered_event_ids)
 
 @events_bp.route('/<int:event_id>')
 def detail(event_id):

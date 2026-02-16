@@ -50,13 +50,21 @@
             </div>
             <div class="cards-grid">
                 {% for event in events.items %}
+                {% set remaining = event.max_capacity - event.get_registered_count() if event.max_capacity else None %}
+                {% set is_registered = event.id in registered_event_ids %}
                 <article class="card">
                     <span class="tag cas-{{ event.cas_type|lower }}">{{ event.cas_type }}</span>
+                    {% if is_registered %}
+                    <span class="badge badge-registered">Registered</span>
+                    {% endif %}
                     <h3>{{ event.title }}</h3>
                     <p>{{ event.description[:120] }}{% if event.description|length > 120 %}...{% endif %}</p>
                     <div class="card-meta">
-                        <span>{{ event.event_date.strftime('%B %d, %Y') }}</span>
-                        {% if event.location %}<span>{{ event.location }}</span>{% endif %}
+                        <span>📅 {% if event.event_date.hour or event.event_date.minute %}{{ event.event_date.strftime('%B %d, %Y at %I:%M %p') }}{% else %}{{ event.event_date.strftime('%B %d, %Y') }}{% endif %}</span>
+                        {% if event.location %}<span>📍 {{ event.location }}</span>{% endif %}
+                        {% if event.max_capacity and remaining <= 5 %}
+                        <span class="capacity-low">{{ remaining }} spot{{ 's' if remaining != 1 else '' }} left</span>
+                        {% endif %}
                     </div>
                     <a href="{{ url_for('events.detail', event_id=event.id) }}" class="btn btn-ghost btn-sm" style="margin-top: 1rem;">View Details →</a>
                 </article>

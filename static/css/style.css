@@ -1436,6 +1436,12 @@ main {
     color: var(--warning);
 }
 
+.badge-registered {
+    background: rgba(52, 211, 153, 0.2);
+    color: var(--success);
+    margin-left: 0.5rem;
+}
+
 /* Registrations list */
 .registrations-list {
     display: flex;
