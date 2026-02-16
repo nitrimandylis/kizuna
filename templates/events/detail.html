@@ -140,6 +140,23 @@
                 </div>
                 {% endif %}
             </div>
+
+            {% if related_events %}
+            <div class="related-events">
+                <h2>Related Events</h2>
+                <div class="related-events-grid">
+                    {% for related in related_events %}
+                    <a href="{{ url_for('events.detail', event_id=related.id) }}" class="related-event-card">
+                        <div class="related-event-title">{{ related.title }}</div>
+                        <div class="related-event-meta">
+                            <span>{{ related.event_date.strftime('%b %d, %Y') }}</span>
+                            <span class="tag tag-sm cas-{{ related.cas_type|lower }}">{{ related.cas_type }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

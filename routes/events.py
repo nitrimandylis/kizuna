@@ -63,7 +63,26 @@ def detail(event_id):
             status='confirmed'
         ).first() is not None
 
-    return render_template('events/detail.html', event=event, is_registered=is_registered)
+    today = date.today()
+    related_query = Event.query.filter(
+        Event.id != event_id,
+        Event.is_published == True,
+        Event.event_date >= today
+    )
+    
+    if event.club_id:
+        related_query = related_query.filter(
+            or_(
+                Event.cas_type == event.cas_type,
+                Event.club_id == event.club_id
+            )
+        )
+    else:
+        related_query = related_query.filter(Event.cas_type == event.cas_type)
+    
+    related_events = related_query.order_by(Event.event_date.asc()).limit(3).all()
+
+    return render_template('events/detail.html', event=event, is_registered=is_registered, related_events=related_events)
 
 @events_bp.route('/<int:event_id>/register', methods=['POST'])
 @login_required
