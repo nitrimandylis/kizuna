@@ -6,6 +6,7 @@
 <div class="standard-page">
     <div class="page-header">
         <div class="container">
+            <a href="{{ url_for('events.index') }}" class="back-link">Back to Events</a>
             <h1>{{ event.title }}</h1>
             <p><span class="tag cas-{{ event.cas_type|lower }}">{{ event.cas_type }}</span></p>
         </div>
@@ -15,20 +16,30 @@
         <div class="container" style="max-width: 640px;">
             <div class="card">
                 <div class="detail-section">
-                    <div class="detail-label">Date & Time</div>
-                    <div class="detail-value">{{ event.event_date.strftime('%B %d, %Y at %I:%M %p') }}</div>
+                    <div class="detail-label">
+                        <span aria-hidden="true">📅</span> Date & Time
+                    </div>
+                    <div class="detail-value">{{ event.event_date.strftime('%B %d, %Y') }}{% if event.event_date.strftime('%I:%M %p') != '12:00 AM' %} at {{ event.event_date.strftime('%I:%M %p') }}{% endif %}</div>
                 </div>
                 
                 {% if event.location %}
                 <div class="detail-section">
-                    <div class="detail-label">Location</div>
+                    <div class="detail-label">
+                        <span aria-hidden="true">📍</span> Location
+                    </div>
                     <div class="detail-value">{{ event.location }}</div>
+                    <div class="map-placeholder" style="margin-top: 0.75rem;">
+                        <div class="map-placeholder-icon" aria-hidden="true">🗺️</div>
+                        <span>Map coming soon</span>
+                    </div>
                 </div>
                 {% endif %}
                 
                 {% if event.max_capacity %}
                 <div class="detail-section">
-                    <div class="detail-label">Capacity</div>
+                    <div class="detail-label">
+                        <span aria-hidden="true">👥</span> Capacity
+                    </div>
                     <div class="detail-value">
                         {% set registered = event.get_registered_count() %}
                         {% set remaining = event.max_capacity - registered %}
@@ -42,8 +53,7 @@
                         {% endif %}
                     </div>
                     
-                    <!-- Capacity progress bar -->
-                    <div class="capacity-bar">
+                    <div class="capacity-bar" role="progressbar" aria-valuenow="{{ registered }}" aria-valuemin="0" aria-valuemax="{{ event.max_capacity }}">
                         <div class="capacity-bar-fill" style="width: {{ (registered / event.max_capacity * 100)|round }}%; 
                             {% if remaining <= 0 %}background: var(--primary);
                             {% elif remaining <= 5 %}background: var(--warning);
@@ -54,16 +64,31 @@
                 
                 {% if event.description %}
                 <div class="detail-section">
-                    <div class="detail-label">About</div>
-                    <div class="detail-value" style="color: var(--text-muted); line-height: 1.7;">{{ event.description }}</div>
+                    <div class="detail-label">
+                        <span aria-hidden="true">📝</span> About
+                    </div>
+                    <div class="detail-value" style="color: var(--text-muted); line-height: 1.7; white-space: pre-wrap;">{{ event.description }}</div>
                 </div>
                 {% endif %}
                 
                 {% if event.club %}
                 <div class="detail-section">
-                    <div class="detail-label">Organized by</div>
+                    <div class="detail-label">
+                        <span aria-hidden="true">🏛️</span> Organized by
+                    </div>
                     <div class="detail-value">
                         <a href="{{ url_for('clubs.detail', club_id=event.club.id) }}">{{ event.club.name }}</a>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if event.organizer_email %}
+                <div class="detail-section">
+                    <div class="detail-label">
+                        <span aria-hidden="true">✉️</span> Contact
+                    </div>
+                    <div class="detail-value">
+                        <a href="mailto:{{ event.organizer_email }}" style="color: var(--primary);">{{ event.organizer_email }}</a>
                     </div>
                 </div>
                 {% endif %}
@@ -71,23 +96,42 @@
                 {% if current_user.is_authenticated %}
                 <div class="detail-section" style="padding-top: 1.5rem; border-top: 1px solid var(--border);">
                     {% if is_registered %}
-                    <div class="registration-status registered">
-                        <span>You are registered for this event</span>
+                    <div class="registration-status registered" role="status">
+                        <span aria-hidden="true">✓</span> You are registered for this event
                     </div>
-                    <form method="POST" action="{{ url_for('events.unregister', event_id=event.id) }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="btn btn-secondary btn-full">Cancel Registration</button>
-                    </form>
+                    <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+                        <form method="POST" action="{{ url_for('events.unregister', event_id=event.id) }}" style="flex: 1;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-secondary btn-full">Cancel Registration</button>
+                        </form>
+                        <button type="button" class="btn btn-ghost" onclick="shareEvent()" title="Share event">
+                            <span aria-hidden="true">📤</span> Share
+                        </button>
+                    </div>
                     {% elif event.is_full() %}
-                    <div class="registration-status full">
-                        <span>This event is at full capacity</span>
+                    <div class="registration-status full" role="status">
+                        <span aria-hidden="true">⚠</span> This event is at full capacity
                     </div>
+                    <button type="button" class="btn btn-ghost" onclick="shareEvent()" style="margin-top: 1rem;">
+                        <span aria-hidden="true">📤</span> Share
+                    </button>
                     {% else %}
-                    <form method="POST" action="{{ url_for('events.register', event_id=event.id) }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="btn btn-primary btn-full btn-lg">Register Now</button>
-                    </form>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <form method="POST" action="{{ url_for('events.register', event_id=event.id) }}" style="flex: 1;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-primary btn-full btn-lg">Register Now</button>
+                        </form>
+                        <button type="button" class="btn btn-ghost" onclick="shareEvent()" title="Share event">
+                            <span aria-hidden="true">📤</span>
+                        </button>
+                    </div>
                     {% endif %}
+                    
+                    <div style="margin-top: 1rem;">
+                        <a href="{{ url_for('events.download_ics', event_id=event.id) }}" class="btn btn-ghost btn-sm">
+                            <span aria-hidden="true">📆</span> Add to Calendar
+                        </a>
+                    </div>
                 </div>
                 {% else %}
                 <div class="detail-section" style="padding-top: 1.5rem; border-top: 1px solid var(--border);">
@@ -99,4 +143,21 @@
         </div>
     </div>
 </div>
+
+<script>
+function shareEvent() {
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ event.title }}',
+            text: '{{ event.description[:100] if event.description else "" }}',
+            url: window.location.href
+        });
+    } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(window.location.href).then(function() {
+            alert('Link copied to clipboard!');
+        });
+    }
+}
+</script>
 {% endblock %}

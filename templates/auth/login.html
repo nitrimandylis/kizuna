@@ -7,33 +7,49 @@
     <div class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
-                <img src="{{ url_for('static', filename='images/kizuna-logo.svg') }}" alt="Kizuna" class="auth-logo">
+                <img src="{{ url_for('static', filename='images/kizuna-logo.svg') }}" alt="Kizuna" class="auth-logo" width="56" height="56">
                 <h1>Welcome back</h1>
                 <p>Sign in to your account</p>
             </div>
 
-            <form method="POST">
+            <form method="POST" data-loading>
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
                 <div class="form-group">
                     <label class="form-label" for="username">Username or Email</label>
-                    <input type="text" id="username" name="username" class="form-input" required autofocus>
+                    <input type="text" id="username" name="username" class="form-input" required autocomplete="username" autofocus>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label" for="password">Password</label>
-                    <input type="password" id="password" name="password" class="form-input" required>
+                    <div class="password-field">
+                        <input type="password" id="password" name="password" class="form-input" required autocomplete="current-password">
+                        <button type="button" class="password-toggle" aria-label="Toggle password visibility" onclick="togglePassword(this)">👁</button>
+                    </div>
                 </div>
 
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" id="remember" name="remember" style="width: auto;">
-                        <label for="remember" style="font-size: 0.9rem; color: var(--text-muted);">Remember me</label>
-                    </div>
+                <div class="form-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="remember" name="remember" style="width: 18px; height: 18px; accent-color: var(--primary);">
+                        <span style="font-size: 0.9rem; color: var(--text-muted);">Remember me</span>
+                    </label>
                     <a href="{{ url_for('auth.forgot_password') }}" style="font-size: 0.9rem; color: var(--primary);">Forgot password?</a>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-full btn-lg">Sign In</button>
             </form>
+
+            <div class="social-login">
+                <p>Or continue with</p>
+                <div class="social-buttons">
+                    <button type="button" class="social-btn" disabled title="Coming soon">
+                        <span>🔍</span> Google
+                    </button>
+                    <button type="button" class="social-btn" disabled title="Coming soon">
+                        <span>🐙</span> GitHub
+                    </button>
+                </div>
+            </div>
 
             <div class="auth-footer">
                 Don't have an account? <a href="{{ url_for('auth.register') }}">Create one</a>
@@ -41,4 +57,13 @@
         </div>
     </div>
 </div>
+
+<script>
+function togglePassword(btn) {
+    const input = btn.previousElementSibling;
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+    btn.textContent = isPassword ? '🙈' : '👁';
+}
+</script>
 {% endblock %}

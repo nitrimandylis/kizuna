@@ -1,5 +1,5 @@
 import logging
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, make_response
 from flask_login import login_required, current_user
 from models import db, Event, EventRegistration
 from sqlalchemy import or_, func
@@ -106,3 +106,29 @@ def unregister(event_id):
 
     flash('You have been unregistered from the event', 'success')
     return redirect(url_for('events.detail', event_id=event_id))
+
+@events_bp.route('/<int:event_id>/download-ics')
+def download_ics(event_id):
+    event = Event.query.get_or_404(event_id)
+    
+    dtstart = event.event_date.strftime('%Y%m%dT%H%M%SZ')
+    dtend = event.end_date.strftime('%Y%m%dT%H%M%SZ') if event.end_date else dtstart
+    
+    ics_content = f"""BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Kizuna//EN
+BEGIN:VEVENT
+UID:{event_id}@kizuna
+DTSTART:{dtstart}
+DTEND:{dtend}
+SUMMARY:{event.title}
+DESCRIPTION:{event.description or ''}
+LOCATION:{event.location or ''}
+END:VEVENT
+END:VCALENDAR"""
+    
+    response = make_response(ics_content)
+    response.headers['Content-Type'] = 'text/calendar; charset=utf-8'
+    response.headers['Content-Disposition'] = f'attachment; filename=event_{event_id}.ics'
+    
+    return response
