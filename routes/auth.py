@@ -1,7 +1,7 @@
 import logging
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
-from models import db, User, PasswordResetToken
+from models import db, User, PasswordResetToken, EmailVerificationToken
 from datetime import datetime, timedelta
 from utils import validate_username, validate_email, validate_password, check_rate_limit, get_client_ip
 import secrets
@@ -63,17 +63,97 @@ def register():
             return render_template('auth/register.html')
 
         # Create user
-        user = User(username=username, email=email)
+        user = User(username=username, email=email, email_verified=False)
         user.set_password(password)
         db.session.add(user)
+        
+        # Create verification token
+        token = secrets.token_urlsafe(32)
+        verification_token = EmailVerificationToken(
+            user_id=user.id,
+            token=token,
+            expires_at=datetime.utcnow() + timedelta(hours=24)
+        )
+        db.session.add(verification_token)
         db.session.commit()
         
         logger.info(f"New user registered: {username} ({email}) from IP: {ip}")
-
-        flash('Registration successful! You can now log in.', 'success')
+        
+        # Send verification email
+        from mail_utils import send_verification_email
+        result = send_verification_email(user, token)
+        
+        if isinstance(result, str):
+            # Development mode - show the link
+            flash(f'Account created! Verify your email: {result}', 'info')
+        else:
+            flash('Account created! Please check your email to verify your account.', 'success')
+        
         return redirect(url_for('auth.login'))
 
     return render_template('auth/register.html')
+
+
+@auth_bp.route('/verify-email/<token>')
+def verify_email(token):
+    if current_user.is_authenticated and current_user.email_verified:
+        flash('Your email is already verified.', 'info')
+        return redirect(url_for('main.index'))
+    
+    verification_token = EmailVerificationToken.query.filter_by(token=token).first()
+    
+    if not verification_token or not verification_token.is_valid():
+        logger.warning(f"Invalid verification token used")
+        flash('Invalid or expired verification link', 'error')
+        return redirect(url_for('auth.login'))
+    
+    user = verification_token.user
+    user.email_verified = True
+    verification_token.used = True
+    db.session.commit()
+    
+    logger.info(f"Email verified for user: {user.username}")
+    flash('Email verified successfully! You can now log in.', 'success')
+    return redirect(url_for('auth.login'))
+
+
+@auth_bp.route('/resend-verification', methods=['GET', 'POST'])
+def resend_verification():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        user = User.query.filter_by(email=email).first()
+        
+        if user and not user.email_verified:
+            # Invalidate old tokens
+            EmailVerificationToken.query.filter_by(user_id=user.id, used=False).update({'used': True})
+            
+            # Create new token
+            token = secrets.token_urlsafe(32)
+            verification_token = EmailVerificationToken(
+                user_id=user.id,
+                token=token,
+                expires_at=datetime.utcnow() + timedelta(hours=24)
+            )
+            db.session.add(verification_token)
+            db.session.commit()
+            
+            from mail_utils import send_verification_email
+            result = send_verification_email(user, token)
+            
+            if isinstance(result, str):
+                flash(f'Verification link: {result}', 'info')
+            else:
+                flash('Verification email sent! Check your inbox.', 'success')
+        else:
+            flash('If that email is registered and unverified, a new verification link has been sent.', 'info')
+        
+        return redirect(url_for('auth.login'))
+    
+    return render_template('auth/resend_verification.html')
+
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -102,6 +182,11 @@ def login():
         ).first()
 
         if user and user.check_password(password):
+            # Check if email is verified (skip for admin users)
+            if not user.email_verified and not user.is_admin:
+                flash('Please verify your email before logging in. Check your inbox or request a new verification link.', 'warning')
+                return redirect(url_for('auth.resend_verification'))
+            
             login_user(user, remember=remember)
             logger.info(f"User logged in: {user.username} from IP: {ip}")
             next_page = request.args.get('next')
@@ -114,6 +199,7 @@ def login():
 
     return render_template('auth/login.html')
 
+
 @auth_bp.route('/logout')
 @login_required
 def logout():
@@ -122,6 +208,7 @@ def logout():
     logger.info(f"User logged out: {username}")
     flash('You have been logged out.', 'success')
     return redirect(url_for('main.index'))
+
 
 @auth_bp.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
@@ -161,9 +248,14 @@ def forgot_password():
             
             logger.info(f"Password reset token created for user: {user.username} ({email})")
             
-            # In production, send email here
-            reset_url = url_for('auth.reset_password', token=token, _external=True)
-            flash(f'Password reset link (would be emailed): {reset_url}', 'info')
+            # Send email
+            from mail_utils import send_password_reset_email
+            result = send_password_reset_email(user, token)
+            
+            if isinstance(result, str):
+                flash(f'Password reset link: {result}', 'info')
+            else:
+                flash('If that email is registered, a reset link has been sent.', 'info')
         else:
             logger.info(f"Password reset requested for non-existent email: {email}")
             flash('If that email is registered, a reset link has been sent.', 'info')
@@ -171,6 +263,7 @@ def forgot_password():
         return redirect(url_for('auth.login'))
 
     return render_template('auth/forgot_password.html')
+
 
 @auth_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):

@@ -34,6 +34,10 @@ def create_app(config_name=None):
     login_manager.init_app(app)
     csrf.init_app(app)
     
+    # Initialize Flask-Mail
+    from mail_utils import init_mail
+    init_mail(app)
+    
     # Configure Talisman for security headers
     # Only enable strict HTTPS in production
     if config_name == 'production':

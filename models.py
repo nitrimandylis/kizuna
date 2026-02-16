@@ -14,6 +14,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
+    email_verified = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     registrations = db.relationship('EventRegistration', backref='user', lazy=True, cascade='all, delete-orphan')
@@ -27,6 +28,23 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return f'<User {self.username}>'
+
+
+class EmailVerificationToken(db.Model):
+    __tablename__ = 'email_verification_tokens'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    token = db.Column(db.String(100), unique=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    used = db.Column(db.Boolean, default=False)
+    
+    user = db.relationship('User', backref='verification_tokens')
+    
+    def is_valid(self):
+        return not self.used and datetime.utcnow() < self.expires_at
+
 
 class Club(db.Model):
     __tablename__ = 'clubs'
@@ -49,6 +67,7 @@ class Club(db.Model):
 
     def __repr__(self):
         return f'<Club {self.name}>'
+
 
 class Event(db.Model):
     __tablename__ = 'events'
@@ -81,6 +100,7 @@ class Event(db.Model):
     def __repr__(self):
         return f'<Event {self.title}>'
 
+
 class EventRegistration(db.Model):
     __tablename__ = 'event_registrations'
 
@@ -98,6 +118,7 @@ class EventRegistration(db.Model):
     def __repr__(self):
         return f'<EventRegistration {self.full_name} - {self.event_id}>'
 
+
 class NewsletterSubscription(db.Model):
     __tablename__ = 'newsletter_subscriptions'
 
@@ -108,6 +129,7 @@ class NewsletterSubscription(db.Model):
 
     def __repr__(self):
         return f'<NewsletterSubscription {self.user_id}>'
+
 
 class PasswordResetToken(db.Model):
     __tablename__ = 'password_reset_tokens'
@@ -122,5 +144,4 @@ class PasswordResetToken(db.Model):
     user = db.relationship('User', backref='reset_tokens')
     
     def is_valid(self):
-        from datetime import datetime
         return not self.used and datetime.utcnow() < self.expires_at
