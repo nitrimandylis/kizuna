@@ -13,6 +13,17 @@
 
     <div class="page-content">
         <div class="container">
+            <!-- Search -->
+            <div class="list-controls">
+                <form method="GET" action="{{ url_for('clubs.index') }}" class="search-form">
+                    <input type="text" name="q" value="{{ search }}" placeholder="Search clubs..." class="search-input">
+                    <button type="submit" class="btn btn-secondary btn-sm">Search</button>
+                    {% if search %}
+                    <a href="{{ url_for('clubs.index') }}" class="btn btn-ghost btn-sm">Clear</a>
+                    {% endif %}
+                </form>
+            </div>
+
             {% if clubs.items %}
             <div class="cards-grid">
                 {% for club in clubs.items %}
@@ -33,7 +44,7 @@
             {% if clubs.pages > 1 %}
             <nav class="pagination">
                 {% if clubs.has_prev %}
-                <a href="{{ url_for('clubs.index', page=clubs.prev_num) }}" class="pagination-btn">
+                <a href="{{ url_for('clubs.index', page=clubs.prev_num, q=search) }}" class="pagination-btn">
                     ← Previous
                 </a>
                 {% else %}
@@ -46,7 +57,7 @@
                             {% if page_num == clubs.page %}
                             <span class="pagination-num active">{{ page_num }}</span>
                             {% else %}
-                            <a href="{{ url_for('clubs.index', page=page_num) }}" class="pagination-num">{{ page_num }}</a>
+                            <a href="{{ url_for('clubs.index', page=page_num, q=search) }}" class="pagination-num">{{ page_num }}</a>
                             {% endif %}
                         {% else %}
                         <span class="pagination-ellipsis">…</span>
@@ -55,7 +66,7 @@
                 </div>
 
                 {% if clubs.has_next %}
-                <a href="{{ url_for('clubs.index', page=clubs.next_num) }}" class="pagination-btn">
+                <a href="{{ url_for('clubs.index', page=clubs.next_num, q=search) }}" class="pagination-btn">
                     Next →
                 </a>
                 {% else %}
@@ -66,8 +77,8 @@
             {% endif %}
             {% else %}
             <div class="empty-state">
-                <h3>No clubs yet</h3>
-                <p>Check back soon for club listings.</p>
+                <h3>{% if search %}No clubs found{% else %}No clubs yet{% endif %}</h3>
+                <p>{% if search %}Try a different search term{% else %}Check back soon for club listings.{% endif %}</p>
             </div>
             {% endif %}
         </div>

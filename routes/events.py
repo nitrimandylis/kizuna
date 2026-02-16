@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from models import db, Event, EventRegistration
+from sqlalchemy import or_
 
 events_bp = Blueprint('events', __name__, url_prefix='/events')
 
@@ -8,13 +9,26 @@ events_bp = Blueprint('events', __name__, url_prefix='/events')
 def index():
     page = request.args.get('page', 1, type=int)
     cas_type = request.args.get('type')
+    search = request.args.get('q', '').strip()
 
     query = Event.query.filter_by(is_published=True)
+    
+    # Filter by CAS type
     if cas_type:
         query = query.filter_by(cas_type=cas_type)
+    
+    # Search functionality
+    if search:
+        search_filter = or_(
+            Event.title.ilike(f'%{search}%'),
+            Event.description.ilike(f'%{search}%'),
+            Event.location.ilike(f'%{search}%'),
+            Event.organizer_name.ilike(f'%{search}%')
+        )
+        query = query.filter(search_filter)
 
     events = query.order_by(Event.event_date.desc()).paginate(page=page, per_page=20)
-    return render_template('events/index.html', events=events, selected_type=cas_type)
+    return render_template('events/index.html', events=events, selected_type=cas_type, search=search)
 
 @events_bp.route('/<int:event_id>')
 def detail(event_id):
