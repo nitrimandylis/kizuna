@@ -1,8 +1,10 @@
+import logging
 from flask import Blueprint, render_template, request
 from models import Club
 from sqlalchemy import or_
 
 clubs_bp = Blueprint('clubs', __name__, url_prefix='/clubs')
+logger = logging.getLogger(__name__)
 
 @clubs_bp.route('/')
 def index():
@@ -28,4 +30,5 @@ def index():
 def detail(club_id):
     club = Club.query.get_or_404(club_id)
     events = club.events if club.events else []
+    logger.debug(f"Club detail viewed: '{club.name}' (ID: {club_id})")
     return render_template('clubs/detail.html', club=club, events=events)

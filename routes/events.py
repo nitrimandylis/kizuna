@@ -1,9 +1,11 @@
+import logging
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from models import db, Event, EventRegistration
 from sqlalchemy import or_
 
 events_bp = Blueprint('events', __name__, url_prefix='/events')
+logger = logging.getLogger(__name__)
 
 @events_bp.route('/')
 def index():
@@ -54,6 +56,7 @@ def register(event_id):
         return redirect(url_for('events.detail', event_id=event_id))
 
     if event.is_full():
+        logger.warning(f"Registration attempt for full event: '{event.title}' (ID: {event_id}) by user: {current_user.username}")
         flash('This event is at full capacity', 'error')
         return redirect(url_for('events.detail', event_id=event_id))
 
@@ -66,6 +69,8 @@ def register(event_id):
 
     db.session.add(registration)
     db.session.commit()
+    
+    logger.info(f"User registered for event: '{event.title}' (ID: {event_id}) - user: {current_user.username}")
 
     flash('Successfully registered for the event!', 'success')
     return redirect(url_for('events.detail', event_id=event_id))
@@ -80,6 +85,8 @@ def unregister(event_id):
 
     db.session.delete(registration)
     db.session.commit()
+    
+    logger.info(f"User unregistered from event ID: {event_id} - user: {current_user.username}")
 
     flash('You have been unregistered from the event', 'success')
     return redirect(url_for('events.detail', event_id=event_id))

@@ -49,3 +49,7 @@ build/
 
 # Deployment
 .env.production
+
+# Logs directory
+logs/
+*.log

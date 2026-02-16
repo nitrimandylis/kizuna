@@ -1,3 +1,4 @@
+import logging
 from functools import wraps
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
@@ -9,11 +10,13 @@ from utils import (
 )
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
+logger = logging.getLogger(__name__)
 
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated or not current_user.is_admin:
+            logger.warning(f"Unauthorized admin access attempt by: {current_user.username if current_user.is_authenticated else 'anonymous'}")
             flash('Admin access required', 'error')
             return redirect(url_for('main.index'))
         return f(*args, **kwargs)
@@ -26,6 +29,7 @@ def dashboard():
     total_events = Event.query.count()
     total_registrations = EventRegistration.query.count()
     total_users = User.query.count()
+    logger.debug(f"Admin dashboard accessed by: {current_user.username}")
 
     return render_template('admin/dashboard.html',
                          total_events=total_events,
@@ -105,6 +109,8 @@ def create_event():
 
         db.session.add(event)
         db.session.commit()
+        
+        logger.info(f"Event created: '{title}' (ID: {event.id}) by admin: {current_user.username}")
 
         flash('Event created successfully', 'success')
         return redirect(url_for('admin.manage_events'))
@@ -176,6 +182,7 @@ def edit_event(event_id):
             return render_template('admin/edit_event.html', event=event, clubs=clubs)
         
         db.session.commit()
+        logger.info(f"Event updated: '{event.title}' (ID: {event.id}) by admin: {current_user.username}")
         flash('Event updated successfully', 'success')
         return redirect(url_for('admin.manage_events'))
     
@@ -187,8 +194,10 @@ def edit_event(event_id):
 @admin_required
 def delete_event(event_id):
     event = Event.query.get_or_404(event_id)
+    event_title = event.title
     db.session.delete(event)
     db.session.commit()
+    logger.info(f"Event deleted: '{event_title}' (ID: {event_id}) by admin: {current_user.username}")
     flash('Event deleted', 'success')
     return redirect(url_for('admin.manage_events'))
 
@@ -243,6 +252,8 @@ def create_club():
         db.session.add(club)
         db.session.commit()
         
+        logger.info(f"Club created: '{name}' (ID: {club.id}) by admin: {current_user.username}")
+        
         flash('Club created successfully', 'success')
         return redirect(url_for('admin.manage_clubs'))
     
@@ -291,6 +302,7 @@ def edit_club(club_id):
             return render_template('admin/edit_club.html', club=club)
         
         db.session.commit()
+        logger.info(f"Club updated: '{club.name}' (ID: {club.id}) by admin: {current_user.username}")
         flash('Club updated successfully', 'success')
         return redirect(url_for('admin.manage_clubs'))
     
@@ -301,8 +313,10 @@ def edit_club(club_id):
 @admin_required
 def delete_club(club_id):
     club = Club.query.get_or_404(club_id)
+    club_name = club.name
     db.session.delete(club)
     db.session.commit()
+    logger.info(f"Club deleted: '{club_name}' (ID: {club_id}) by admin: {current_user.username}")
     flash('Club deleted', 'success')
     return redirect(url_for('admin.manage_clubs'))
 
@@ -326,5 +340,6 @@ def toggle_admin(user_id):
     
     user.is_admin = not user.is_admin
     db.session.commit()
+    logger.info(f"Admin status toggled for user '{user.username}' (ID: {user.id}) to {user.is_admin} by admin: {current_user.username}")
     flash(f"Admin status {'granted' if user.is_admin else 'revoked'}", 'success')
     return redirect(url_for('admin.manage_users'))
