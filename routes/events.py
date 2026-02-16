@@ -79,6 +79,14 @@ def register(event_id):
     db.session.commit()
     
     logger.info(f"User registered for event: '{event.title}' (ID: {event_id}) - user: {current_user.username}")
+    
+    # Send confirmation email
+    try:
+        from mail_utils import send_event_registration_email
+        send_event_registration_email(current_user, event)
+    except Exception as e:
+        logger.error(f"Failed to send registration email: {e}")
+        # Don't fail the registration if email fails
 
     flash('Successfully registered for the event!', 'success')
     return redirect(url_for('events.detail', event_id=event_id))

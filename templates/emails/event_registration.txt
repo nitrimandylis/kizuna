@@ -1,0 +1,19 @@
+Kizuna - Event Registration Confirmed
+
+Hi {{ user.username }},
+
+You have successfully registered for the following event:
+
+{{ event.title }}
+CAS Type: {{ event.cas_type }}
+Date: {{ event.event_date.strftime('%B %d, %Y') }}
+{% if event.location %}Location: {{ event.location }}{% endif %}
+
+View event details: {{ event_url }}
+
+If you need to cancel your registration, visit the event page and click "Cancel Registration".
+
+See you there!
+
+---
+Kizuna Initiative - Connecting the IBDP Community
