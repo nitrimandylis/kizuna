@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}404 - Page Not Found | Kizuna{% endblock %}
+
+{% block content %}
+<div class="standard-page">
+    <div class="error-page">
+        <div class="error-code">404</div>
+        <h1>Page Not Found</h1>
+        <p>The page you're looking for doesn't exist or has been moved.</p>
+        <div class="error-actions">
+            <a href="{{ url_for('main.index') }}" class="btn btn-primary">Go Home</a>
+            <a href="{{ url_for('events.index') }}" class="btn btn-secondary">Browse Events</a>
+        </div>
+    </div>
+</div>
