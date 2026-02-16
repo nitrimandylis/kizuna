@@ -215,28 +215,30 @@ def forgot_password():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     
-    # Rate limit by IP
     ip = get_client_ip()
     allowed, remaining = check_rate_limit(f'forgot:{ip}', max_requests=3, window_seconds=3600)
     if not allowed:
         logger.warning(f"Password reset rate limited for IP: {ip}")
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return {'success': False, 'error': f'Too many requests. Please try again in {remaining // 60} minutes.'}
         flash(f'Too many requests. Please try again in {remaining // 60} minutes.', 'error')
         return render_template('auth/forgot_password.html')
 
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
         
         if not email:
+            if is_ajax:
+                return {'success': False, 'error': 'Please enter your email address'}
             flash('Please enter your email address', 'error')
             return render_template('auth/forgot_password.html')
 
         user = User.query.filter_by(email=email).first()
         
         if user:
-            # Invalidate old tokens
             PasswordResetToken.query.filter_by(user_id=user.id, used=False).update({'used': True})
             
-            # Create new token
             token = secrets.token_urlsafe(32)
             reset_token = PasswordResetToken(
                 user_id=user.id,
@@ -248,9 +250,11 @@ def forgot_password():
             
             logger.info(f"Password reset token created for user: {user.username} ({email})")
             
-            # Send email
             from mail_utils import send_password_reset_email
             result = send_password_reset_email(user, token)
+            
+            if is_ajax:
+                return {'success': True}
             
             if isinstance(result, str):
                 flash(f'Password reset link: {result}', 'info')
@@ -258,8 +262,12 @@ def forgot_password():
                 flash('If that email is registered, a reset link has been sent.', 'info')
         else:
             logger.info(f"Password reset requested for non-existent email: {email}")
+            if is_ajax:
+                return {'success': True}
             flash('If that email is registered, a reset link has been sent.', 'info')
         
+        if is_ajax:
+            return {'success': True}
         return redirect(url_for('auth.login'))
 
     return render_template('auth/forgot_password.html')
