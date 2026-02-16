@@ -1,18 +1,23 @@
 import os
 from datetime import timedelta
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 
 
 def get_database_url():
     """
     Get database URL from environment, handling PostgreSQL URL conversion.
-    Heroku/Render use postgres:// which needs to be postgresql:// for SQLAlchemy.
+    Converts to use psycopg (v3) driver instead of psycopg2.
     """
     database_url = os.getenv('DATABASE_URL', 'sqlite:///kizuna.db')
     
     # Convert postgres:// to postgresql:// for SQLAlchemy compatibility
     if database_url.startswith('postgres://'):
         database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    
+    # Use psycopg (v3) driver instead of default psycopg2
+    # postgresql:// -> postgresql+psycopg://
+    if database_url.startswith('postgresql://') and '+' not in database_url.split('://')[0]:
+        database_url = database_url.replace('postgresql://', 'postgresql+psycopg://', 1)
     
     return database_url
 

@@ -4,7 +4,7 @@ from flask import Flask, session, request, g, send_from_directory
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 from flask_talisman import Talisman
-from flask_migrate import Migrate
+
 from flask_compress import Compress
 from config import config
 from models import db
@@ -13,7 +13,7 @@ from logger import setup_logging
 login_manager = LoginManager()
 csrf = CSRFProtect()
 talisman = Talisman()
-migrate = Migrate()
+
 compress = Compress()
 
 # Create logger instance
@@ -37,7 +37,7 @@ def create_app(config_name=None):
 
     # Initialize extensions
     db.init_app(app)
-    migrate.init_app(app, db)
+    
     login_manager.init_app(app)
     csrf.init_app(app)
     compress.init_app(app)
@@ -174,12 +174,13 @@ def create_app(config_name=None):
         from flask import render_template
         return render_template('errors/500.html'), 500
 
-    # Only create tables if not using migrations (development fallback)
-    # In production, use: flask db upgrade
-    if config_name != 'production':
-        with app.app_context():
+    # Create database tables
+    with app.app_context():
+        try:
             db.create_all()
-            logger.info("Application initialized successfully")
+            logger.info("Database tables created successfully")
+        except Exception as e:
+            logger.error(f"Error creating database tables: {e}")
 
     return app
 
