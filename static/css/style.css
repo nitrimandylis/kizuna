@@ -876,6 +876,7 @@ main {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 2rem;
 }
 
 .footer-brand {
@@ -896,6 +897,24 @@ main {
 
 .footer-links a:hover {
     color: var(--text);
+}
+
+.footer-social {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.social-link {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+    opacity: 0.7;
+}
+
+.social-link:hover {
+    color: var(--primary);
+    opacity: 1;
 }
 
 /* ═════════════════════════════════════════════════════════════════════════
@@ -974,6 +993,10 @@ main {
         flex-wrap: wrap;
         justify-content: center;
         gap: 1rem;
+    }
+    
+    .footer-social {
+        justify-content: center;
     }
 }
 
