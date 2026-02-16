@@ -21,6 +21,33 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     });
     
+    // Loading state for forms
+    const forms = document.querySelectorAll('form[data-loading]');
+    forms.forEach(function(form) {
+        form.addEventListener('submit', function() {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn && !submitBtn.classList.contains('btn-loading')) {
+                submitBtn.classList.add('btn-loading');
+                submitBtn.disabled = true;
+                submitBtn.dataset.originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Loading...';
+            }
+        });
+    });
+    
+    // Loading state for buttons with data-loading attribute
+    const loadingBtns = document.querySelectorAll('.btn[data-loading="true"]');
+    loadingBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            if (!btn.classList.contains('btn-loading')) {
+                btn.classList.add('btn-loading');
+                btn.disabled = true;
+                btn.dataset.originalText = btn.textContent;
+                btn.innerHTML = '<span class="spinner"></span> Loading...';
+            }
+        });
+    });
+    
     // Calendar functionality
     const calendarDays = document.getElementById('calendarDays');
     const calendarTitle = document.getElementById('calendarTitle');
@@ -119,16 +146,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         function fetchEvents(year, month) {
+            // Show loading state
+            if (calendarDays) {
+                calendarDays.style.opacity = '0.5';
+            }
+            
             fetch('/api/events?year=' + year + '&month=' + month)
                 .then(function(response) {
                     return response.json();
                 })
                 .then(function(events) {
                     renderCalendar(currentDate, events);
+                    if (calendarDays) {
+                        calendarDays.style.opacity = '1';
+                    }
                 })
                 .catch(function(error) {
                     console.error('Error fetching events:', error);
                     renderCalendar(currentDate, []);
+                    if (calendarDays) {
+                        calendarDays.style.opacity = '1';
+                    }
                 });
         }
         
@@ -155,4 +193,29 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initial load
         loadCalendar();
     }
+    
+    // Search input debounce
+    const searchInputs = document.querySelectorAll('.search-input');
+    searchInputs.forEach(function(input) {
+        let debounceTimer;
+        input.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            const form = input.closest('form');
+            if (form && input.value.length >= 2) {
+                // Add visual feedback
+                input.classList.add('searching');
+            } else {
+                input.classList.remove('searching');
+            }
+        });
+    });
 });
+
+// Helper function to reset button state
+function resetButtonState(btn) {
+    if (btn && btn.dataset.originalText) {
+        btn.textContent = btn.dataset.originalText;
+        btn.classList.remove('btn-loading');
+        btn.disabled = false;
+    }
+}
