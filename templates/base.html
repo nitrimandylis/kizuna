@@ -29,14 +29,23 @@
                 <li role="none"><a href="{{ url_for('clubs.index') }}" class="nav-link" role="menuitem">Clubs</a></li>
                 <li role="none"><a href="{{ url_for('events.index') }}" class="nav-link" role="menuitem">Events</a></li>
                 {% if current_user.is_authenticated %}
-                    <li role="none"><a href="{{ url_for('profile.index') }}" class="nav-link" role="menuitem">Profile</a></li>
-                    {% if current_user.is_admin %}
-                    <li role="none"><a href="{{ url_for('admin.dashboard') }}" class="nav-link" role="menuitem">Admin</a></li>
-                    {% endif %}
-                    <li role="none">
-                        <a href="{{ url_for('auth.logout') }}" class="nav-link" role="menuitem">
-                            <span class="nav-icon" aria-hidden="true">→</span> Logout
-                        </a>
+                    <li role="none" class="user-dropdown">
+                        <button class="user-avatar" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
+                            {{ current_user.username[0]|upper }}
+                        </button>
+                        <ul class="user-dropdown-menu" role="menu">
+                            <li role="none">
+                                <a href="{{ url_for('profile.index') }}" class="user-dropdown-item" role="menuitem">Profile</a>
+                            </li>
+                            {% if current_user.is_admin %}
+                            <li role="none">
+                                <a href="{{ url_for('admin.dashboard') }}" class="user-dropdown-item" role="menuitem">Admin</a>
+                            </li>
+                            {% endif %}
+                            <li role="none">
+                                <a href="{{ url_for('auth.logout') }}" class="user-dropdown-item" role="menuitem">Logout</a>
+                            </li>
+                        </ul>
                     </li>
                 {% else %}
                     <li role="none"><a href="{{ url_for('auth.login') }}" class="nav-link" role="menuitem">Login</a></li>

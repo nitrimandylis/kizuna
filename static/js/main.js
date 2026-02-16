@@ -286,6 +286,35 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // User dropdown toggle
+    const userDropdown = document.querySelector('.user-dropdown');
+    const userAvatar = document.querySelector('.user-avatar');
+    
+    if (userDropdown && userAvatar) {
+        userAvatar.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isOpen = userDropdown.classList.toggle('active');
+            userAvatar.setAttribute('aria-expanded', isOpen);
+        });
+        
+        // Close dropdown on outside click
+        document.addEventListener('click', function(e) {
+            if (userDropdown.classList.contains('active') && !userDropdown.contains(e.target)) {
+                userDropdown.classList.remove('active');
+                userAvatar.setAttribute('aria-expanded', 'false');
+            }
+        });
+        
+        // Close dropdown on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && userDropdown.classList.contains('active')) {
+                userDropdown.classList.remove('active');
+                userAvatar.setAttribute('aria-expanded', 'false');
+                userAvatar.focus();
+            }
+        });
+    }
 });
 
 // Helper function to reset button state

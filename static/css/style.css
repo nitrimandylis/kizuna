@@ -156,6 +156,78 @@ main {
     border-radius: 2px;
 }
 
+.user-dropdown {
+    position: relative;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.user-avatar:hover {
+    background: var(--primary-light);
+    transform: scale(1.05);
+}
+
+.user-avatar:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.user-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    min-width: 160px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: var(--transition);
+    z-index: 200;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.user-dropdown.active .user-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(8px);
+}
+
+.user-dropdown-item {
+    display: block;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    transition: var(--transition);
+}
+
+.user-dropdown-item:hover {
+    background: var(--navy-light);
+    color: var(--text);
+}
+
+.user-dropdown-item:focus {
+    outline: none;
+    background: var(--navy-light);
+    color: var(--text);
+}
+
 /* BUTTONS */
 
 .btn {
@@ -2004,6 +2076,31 @@ main {
     /* Hide nav-icon on mobile */
     .nav-icon {
         display: none;
+    }
+    
+    .user-dropdown {
+        margin-top: 1rem;
+    }
+    
+    .user-dropdown-menu {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        margin-top: 0.5rem;
+        background: transparent;
+    }
+    
+    .user-dropdown.active .user-dropdown-menu {
+        transform: none;
+    }
+    
+    .user-dropdown-item {
+        padding: 1rem;
+        border-radius: 8px;
     }
 }
 
