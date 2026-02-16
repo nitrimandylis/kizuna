@@ -4,7 +4,6 @@ from flask import Flask, session, request, g, send_from_directory
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 from flask_talisman import Talisman
-
 from flask_compress import Compress
 from config import config
 from models import db
@@ -13,7 +12,6 @@ from logger import setup_logging
 login_manager = LoginManager()
 csrf = CSRFProtect()
 talisman = Talisman()
-
 compress = Compress()
 
 # Create logger instance
@@ -37,7 +35,6 @@ def create_app(config_name=None):
 
     # Initialize extensions
     db.init_app(app)
-    
     login_manager.init_app(app)
     csrf.init_app(app)
     compress.init_app(app)
@@ -47,7 +44,6 @@ def create_app(config_name=None):
     init_mail(app)
     
     # Configure Talisman for security headers
-    # Only enable strict HTTPS in production
     if config_name == 'production':
         talisman.init_app(
             app,
@@ -71,7 +67,6 @@ def create_app(config_name=None):
             }
         )
     else:
-        # Development mode - relaxed security
         talisman.init_app(
             app,
             force_https=False,
@@ -95,7 +90,6 @@ def create_app(config_name=None):
     # Request logging
     @app.before_request
     def before_request():
-        """Log incoming requests and set up request context."""
         g.start_time = None
         if request.endpoint and not request.endpoint.startswith('static'):
             from time import time
@@ -104,16 +98,12 @@ def create_app(config_name=None):
 
     @app.after_request
     def after_request(response):
-        """Log completed requests and add caching headers."""
-        # Log non-static requests
         if hasattr(g, 'start_time') and g.start_time:
             from time import time
             duration = (time() - g.start_time) * 1000
             logger.debug(f"Response: {request.method} {request.path} -> {response.status_code} ({duration:.2f}ms)")
         
-        # Add caching headers for static files
         if request.endpoint == 'static' or request.path.startswith('/static/'):
-            # Cache static files for 1 year in production, 1 hour in development
             max_age = 31536000 if config_name == 'production' else 3600
             response.cache_control.max_age = max_age
             response.cache_control.public = True
@@ -121,10 +111,8 @@ def create_app(config_name=None):
         
         return response
 
-    # Session security enhancements
     @app.before_request
     def make_session_permanent():
-        """Ensure session is marked as permanent for timeout control"""
         if request.endpoint and not request.endpoint.startswith('static'):
             session.permanent = True
     
@@ -167,20 +155,40 @@ def create_app(config_name=None):
 
     @app.errorhandler(Exception)
     def handle_exception(error):
-        """Handle all uncaught exceptions."""
         import traceback
         db.session.rollback()
         logger.error(f"Unhandled exception: {str(error)}\n{traceback.format_exc()}")
         from flask import render_template
         return render_template('errors/500.html'), 500
 
-    # Create database tables
+    # Create database tables and admin user
     with app.app_context():
         try:
             db.create_all()
             logger.info("Database tables created successfully")
+            
+            # Create admin user if not exists
+            from models import User
+            admin_username = os.getenv('ADMIN_USERNAME', 'admin')
+            admin_password = os.getenv('ADMIN_PASSWORD', 'admin123')
+            
+            admin = User.query.filter_by(username=admin_username).first()
+            if not admin:
+                admin = User(
+                    username=admin_username,
+                    email='admin@kizuna.com',
+                    is_admin=True,
+                    email_verified=True
+                )
+                admin.set_password(admin_password)
+                db.session.add(admin)
+                db.session.commit()
+                logger.info(f"Admin user created: {admin_username}")
+            else:
+                logger.info("Admin user already exists")
+                
         except Exception as e:
-            logger.error(f"Error creating database tables: {e}")
+            logger.error(f"Error initializing database: {e}")
 
     return app
 
