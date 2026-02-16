@@ -3077,3 +3077,191 @@ main {
         min-width: 700px;
     }
 }
+
+/* ═════════════════════════════════════════════════════════════════════════
+   ABOUT PAGE - COMMUNITY AVATARS
+   ═════════════════════════════════════════════════════════════════════════ */
+
+.community-avatars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+}
+
+.community-avatar-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.community-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    transition: var(--transition);
+}
+
+.community-avatar:hover {
+    transform: scale(1.1);
+    background: var(--primary-light);
+}
+
+.community-avatar-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: center;
+    max-width: 80px;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   ABOUT PAGE - TIMELINE
+   ═════════════════════════════════════════════════════════════════════════ */
+
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 1.5rem;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -2rem;
+    top: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 3px solid var(--bg-elevated);
+    box-shadow: 0 0 0 2px var(--border);
+}
+
+.timeline-marker-future {
+    background: var(--text-muted);
+}
+
+.timeline-content {
+    padding-left: 0.5rem;
+}
+
+.timeline-date {
+    font-size: 0.8rem;
+    color: var(--primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.timeline-marker-future + .timeline-content .timeline-date {
+    color: var(--text-muted);
+}
+
+.timeline-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.timeline-description {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   ABOUT PAGE - CONTACT SECTION
+   ═════════════════════════════════════════════════════════════════════════ */
+
+.contact-section {
+    display: flex;
+    justify-content: center;
+}
+
+.contact-email-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background: var(--navy-light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 1.1rem;
+    transition: var(--transition);
+}
+
+.contact-email-link:hover {
+    border-color: var(--primary);
+    background: var(--navy-lighter);
+}
+
+.contact-email-icon {
+    font-size: 1.5rem;
+}
+
+.contact-email-text {
+    font-weight: 500;
+}
+
+.contact-form-placeholder textarea.form-input {
+    resize: vertical;
+    min-height: 100px;
+}
+
+@media (max-width: 768px) {
+    .community-avatars {
+        gap: 1rem;
+    }
+    
+    .community-avatar {
+        width: 56px;
+        height: 56px;
+        font-size: 1.1rem;
+    }
+    
+    .community-avatar-label {
+        font-size: 0.7rem;
+    }
+    
+    .timeline {
+        padding-left: 1.5rem;
+    }
+    
+    .timeline-marker {
+        left: -1.5rem;
+        width: 14px;
+        height: 14px;
+    }
+    
+    .contact-email-link {
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+    }
+}
