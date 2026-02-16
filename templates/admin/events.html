@@ -39,7 +39,8 @@
                             <td>{{ event.event_date.strftime('%b %d, %Y') }}</td>
                             <td>{{ 'Published' if event.is_published else 'Draft' }}</td>
                             <td>{{ event.get_registered_count() }}{% if event.max_capacity %} / {{ event.max_capacity }}{% endif %}</td>
-                            <td>
+                            <td class="action-buttons">
+                                <a href="{{ url_for('admin.event_participants', event_id=event.id) }}" class="btn btn-ghost btn-sm">Participants</a>
                                 <a href="{{ url_for('admin.edit_event', event_id=event.id) }}" class="btn btn-ghost btn-sm">Edit</a>
                                 <a href="{{ url_for('events.detail', event_id=event.id) }}" class="btn btn-ghost btn-sm">View</a>
                                 <form method="POST" action="{{ url_for('admin.delete_event', event_id=event.id) }}" style="display: inline;" onsubmit="return confirm('Delete this event?');">

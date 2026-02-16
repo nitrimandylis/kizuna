@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.title }} - Participants - Kizuna{% endblock %}
+
+{% block content %}
+<div class="standard-page">
+    <div class="page-header">
+        <div class="container">
+            <div class="admin-header">
+                <div>
+                    <h1>{{ event.title }} - Participants</h1>
+                    <p><span class="tag cas-{{ event.cas_type|lower }}">{{ event.cas_type }}</span> 
+                    {{ event.event_date.strftime('%B %d, %Y') }}</p>
+                </div>
+                <div class="admin-actions">
+                    <a href="{{ url_for('admin.export_event_participants_csv', event_id=event.id) }}" class="btn btn-secondary">Export CSV</a>
+                    <a href="{{ url_for('admin.export_event_participants_json', event_id=event.id) }}" class="btn btn-secondary">Export JSON</a>
+                    <a href="{{ url_for('admin.manage_events') }}" class="btn btn-ghost">Back to Events</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-content">
+        <div class="container">
+            {% if registrations %}
+            <div class="admin-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Hours</th>
+                            <th>Registered</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reg in registrations %}
+                        <tr>
+                            <td>{{ reg.full_name or '-' }}</td>
+                            <td>{{ reg.email }}</td>
+                            <td>{{ reg.phone or '-' }}</td>
+                            <td>
+                                <span class="status-badge status-{{ reg.status }}">{{ reg.status.title() }}</span>
+                            </td>
+                            <td>{{ reg.hours_contributed or 0 }}</td>
+                            <td>{{ reg.registered_at.strftime('%Y-%m-%d') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="export-summary">
+                <p><strong>Total Participants:</strong> {{ registrations|length }}</p>
+                <p><strong>Confirmed:</strong> {{ registrations|selectattr('status', 'equalto', 'confirmed')|list|length }}</p>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h3>No participants yet</h3>
+                <p>No one has registered for this event.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

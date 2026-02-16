@@ -343,3 +343,104 @@ def toggle_admin(user_id):
     logger.info(f"Admin status toggled for user '{user.username}' (ID: {user.id}) to {user.is_admin} by admin: {current_user.username}")
     flash(f"Admin status {'granted' if user.is_admin else 'revoked'}", 'success')
     return redirect(url_for('admin.manage_users'))
+
+# Event Participants Export
+@admin_bp.route('/events/<int:event_id>/participants')
+@login_required
+@admin_required
+def event_participants(event_id):
+    """View event participants."""
+    event = Event.query.get_or_404(event_id)
+    registrations = EventRegistration.query.filter_by(event_id=event_id).order_by(EventRegistration.registered_at).all()
+    return render_template('admin/event_participants.html', event=event, registrations=registrations)
+
+
+@admin_bp.route('/events/<int:event_id>/export/csv')
+@login_required
+@admin_required
+def export_event_participants_csv(event_id):
+    """Export event participants as CSV."""
+    from flask import Response
+    import csv
+    from io import StringIO
+    
+    event = Event.query.get_or_404(event_id)
+    registrations = EventRegistration.query.filter_by(event_id=event_id).order_by(EventRegistration.registered_at).all()
+    
+    # Create CSV in memory
+    output = StringIO()
+    writer = csv.writer(output)
+    
+    # Write header
+    writer.writerow([
+        'Full Name',
+        'Email',
+        'Phone',
+        'Status',
+        'Hours Contributed',
+        'Registered At',
+        'Notes'
+    ])
+    
+    # Write data
+    for reg in registrations:
+        writer.writerow([
+            reg.full_name or '',
+            reg.email or '',
+            reg.phone or '',
+            reg.status or 'confirmed',
+            reg.hours_contributed or 0,
+            reg.registered_at.strftime('%Y-%m-%d %H:%M:%S') if reg.registered_at else '',
+            reg.notes or ''
+        ])
+    
+    output.seek(0)
+    
+    # Create response
+    response = Response(
+        output.getvalue(),
+        mimetype='text/csv',
+        headers={
+            'Content-Disposition': f'attachment; filename={event.title.replace(" ", "_")}_participants.csv'
+        }
+    )
+    
+    logger.info(f"Exported participants for event '{event.title}' (ID: {event_id}) by admin: {current_user.username}")
+    return response
+
+
+@admin_bp.route('/events/<int:event_id>/export/json')
+@login_required
+@admin_required
+def export_event_participants_json(event_id):
+    """Export event participants as JSON."""
+    from flask import jsonify
+    
+    event = Event.query.get_or_404(event_id)
+    registrations = EventRegistration.query.filter_by(event_id=event_id).order_by(EventRegistration.registered_at).all()
+    
+    data = {
+        'event': {
+            'id': event.id,
+            'title': event.title,
+            'cas_type': event.cas_type,
+            'event_date': event.event_date.isoformat() if event.event_date else None,
+            'location': event.location
+        },
+        'participants': [
+            {
+                'full_name': reg.full_name,
+                'email': reg.email,
+                'phone': reg.phone,
+                'status': reg.status,
+                'hours_contributed': reg.hours_contributed,
+                'registered_at': reg.registered_at.isoformat() if reg.registered_at else None,
+                'notes': reg.notes
+            }
+            for reg in registrations
+        ],
+        'total': len(registrations)
+    }
+    
+    logger.info(f"Exported participants (JSON) for event '{event.title}' (ID: {event_id}) by admin: {current_user.username}")
+    return jsonify(data)

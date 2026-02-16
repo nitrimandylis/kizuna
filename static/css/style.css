@@ -1411,3 +1411,82 @@ main {
 .calendar-day {
     transition: opacity 0.3s ease;
 }
+
+/* ═════════════════════════════════════════════════════════════════════════
+   EXPORT AND ADMIN ENHANCEMENTS
+   ═════════════════════════════════════════════════════════════════════════ */
+
+.admin-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: 4px;
+}
+
+.status-confirmed {
+    background: rgba(52, 211, 153, 0.2);
+    color: var(--success);
+}
+
+.status-cancelled {
+    background: rgba(254, 67, 89, 0.2);
+    color: var(--primary-light);
+}
+
+.status-attended {
+    background: rgba(251, 191, 36, 0.2);
+    color: var(--warning);
+}
+
+.export-summary {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: var(--navy-light);
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.export-summary p {
+    margin: 0.25rem 0;
+}
+
+@media (max-width: 768px) {
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .admin-actions {
+        width: 100%;
+    }
+    
+    .admin-actions .btn {
+        flex: 1;
+        text-align: center;
+    }
+}
+
+.action-buttons {
+    white-space: nowrap;
+}
+
+.action-buttons .btn {
+    margin-right: 0.25rem;
+}
+
+.action-buttons .btn:last-child {
+    margin-right: 0;
+}
+
+.action-buttons form {
+    display: inline;
+}
