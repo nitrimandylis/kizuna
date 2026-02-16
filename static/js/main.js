@@ -364,3 +364,38 @@ function resetButtonState(btn) {
 const style = document.createElement('style');
 style.textContent = '@keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }';
 document.head.appendChild(style);
+
+// FAQ Accordion functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const faqItems = document.querySelectorAll('.faq-item');
+    
+    faqItems.forEach(function(item) {
+        const question = item.querySelector('.faq-question');
+        
+        if (question) {
+            question.addEventListener('click', function() {
+                const isOpen = item.classList.contains('active');
+                
+                // Close all other items
+                faqItems.forEach(function(otherItem) {
+                    if (otherItem !== item) {
+                        otherItem.classList.remove('active');
+                        otherItem.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+                    }
+                });
+                
+                // Toggle current item
+                item.classList.toggle('active', !isOpen);
+                question.setAttribute('aria-expanded', !isOpen);
+            });
+            
+            // Keyboard support
+            question.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    question.click();
+                }
+            });
+        }
+    });
+});
