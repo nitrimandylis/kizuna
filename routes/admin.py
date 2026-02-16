@@ -29,12 +29,20 @@ def dashboard():
     total_events = Event.query.count()
     total_registrations = EventRegistration.query.count()
     total_users = User.query.count()
+    
+    recent_registrations = EventRegistration.query.order_by(EventRegistration.registered_at.desc()).limit(5).all()
+    recent_users = User.query.order_by(User.created_at.desc()).limit(5).all()
+    upcoming_events = Event.query.filter(Event.event_date >= datetime.utcnow()).order_by(Event.event_date.asc()).limit(5).all()
+    
     logger.debug(f"Admin dashboard accessed by: {current_user.username}")
 
     return render_template('admin/dashboard.html',
                          total_events=total_events,
                          total_registrations=total_registrations,
-                         total_users=total_users)
+                         total_users=total_users,
+                         recent_registrations=recent_registrations,
+                         recent_users=recent_users,
+                         upcoming_events=upcoming_events)
 
 @admin_bp.route('/events')
 @login_required

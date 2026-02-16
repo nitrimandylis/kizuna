@@ -890,6 +890,12 @@ main {
     margin-top: 0.25rem;
 }
 
+.activity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
 /* ALERTS */
 
 .alert {

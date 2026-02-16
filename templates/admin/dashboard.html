@@ -55,6 +55,59 @@
                     </div>
                 </div>
             </div>
+
+            <div class="activity-section" style="margin-top: 2rem;">
+                <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Recent Activity</h2>
+                <div class="activity-grid">
+                    <div class="card">
+                        <h3>Recent Registrations</h3>
+                        {% if recent_registrations %}
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            {% for reg in recent_registrations %}
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color, #eee);">
+                                <strong>{{ reg.full_name }}</strong><br>
+                                <small style="color: var(--text-muted);">{{ reg.event.title }}</small>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p style="color: var(--text-muted);">No recent registrations</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="card">
+                        <h3>New Users</h3>
+                        {% if recent_users %}
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            {% for user in recent_users %}
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color, #eee);">
+                                <strong>{{ user.username }}</strong><br>
+                                <small style="color: var(--text-muted);">Joined {{ user.created_at.strftime('%Y-%m-%d') }}</small>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p style="color: var(--text-muted);">No recent users</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Upcoming Events</h3>
+                        {% if upcoming_events %}
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            {% for event in upcoming_events %}
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color, #eee);">
+                                <strong>{{ event.title }}</strong><br>
+                                <small style="color: var(--text-muted);">{{ event.event_date.strftime('%Y-%m-%d') }}</small>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p style="color: var(--text-muted);">No upcoming events</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
