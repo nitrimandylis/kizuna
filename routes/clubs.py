@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from flask import Blueprint, render_template, request
 from models import Club, Event
 from sqlalchemy import or_, func
@@ -39,6 +40,8 @@ def index():
 @clubs_bp.route('/<int:club_id>')
 def detail(club_id):
     club = Club.query.get_or_404(club_id)
-    events = club.events if club.events else []
+    now = datetime.utcnow()
+    upcoming_events = [e for e in club.events if e.event_date >= now] if club.events else []
+    past_events = [e for e in club.events if e.event_date < now] if club.events else []
     logger.debug(f"Club detail viewed: '{club.name}' (ID: {club_id})")
-    return render_template('clubs/detail.html', club=club, events=events)
+    return render_template('clubs/detail.html', club=club, upcoming_events=upcoming_events, past_events=past_events)
