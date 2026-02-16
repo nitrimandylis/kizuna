@@ -136,9 +136,18 @@ def create_event():
             errors.append('Event date is required')
         else:
             try:
-                event_date = datetime.strptime(event_date_str, "%Y-%m-%d")
+                event_date = datetime.strptime(event_date_str, "%Y-%m-%dT%H:%M")
             except ValueError:
                 errors.append('Invalid date format')
+        
+        # Validate end_time
+        end_time_str = request.form.get('end_time', '')
+        end_time = None
+        if end_time_str:
+            try:
+                end_time = datetime.strptime(end_time_str, "%Y-%m-%dT%H:%M")
+            except ValueError:
+                errors.append('Invalid end time format')
         
         # Validate max_capacity
         valid, max_capacity = validate_integer(
@@ -162,6 +171,7 @@ def create_event():
             description=description,
             cas_type=cas_type,
             event_date=event_date,
+            end_time=end_time,
             location=sanitize_input(request.form.get('location', ''), max_length=200),
             max_capacity=max_capacity,
             is_published=True
@@ -216,9 +226,19 @@ def edit_event(event_id):
         event_date_str = request.form.get('event_date', '')
         if event_date_str:
             try:
-                event.event_date = datetime.strptime(event_date_str, "%Y-%m-%d")
+                event.event_date = datetime.strptime(event_date_str, "%Y-%m-%dT%H:%M")
             except ValueError:
                 errors.append('Invalid date format')
+        
+        # Validate end_time
+        end_time_str = request.form.get('end_time', '')
+        if end_time_str:
+            try:
+                event.end_time = datetime.strptime(end_time_str, "%Y-%m-%dT%H:%M")
+            except ValueError:
+                errors.append('Invalid end time format')
+        else:
+            event.end_time = None
         
         # Validate max_capacity
         valid, max_capacity = validate_integer(
