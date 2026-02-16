@@ -18,49 +18,273 @@
                 <a href="{{ url_for('admin.create_event') }}" class="btn btn-primary">Create Event</a>
             </div>
             
-            {% if events.items %}
-            <div class="admin-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Type</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th>Registrations</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for event in events.items %}
-                        <tr>
-                            <td>{{ event.title }}</td>
-                            <td><span class="tag cas-{{ event.cas_type|lower }}">{{ event.cas_type }}</span></td>
-                            <td>{{ event.event_date.strftime('%b %d, %Y') }}</td>
-                            <td>{{ 'Published' if event.is_published else 'Draft' }}</td>
-                            <td>{{ event.get_registered_count() }}{% if event.max_capacity %} / {{ event.max_capacity }}{% endif %}</td>
-                            <td class="action-buttons">
-                                <a href="{{ url_for('admin.event_participants', event_id=event.id) }}" class="btn btn-ghost btn-sm">Participants</a>
-                                <a href="{{ url_for('admin.edit_event', event_id=event.id) }}" class="btn btn-ghost btn-sm">Edit</a>
-                                <a href="{{ url_for('events.detail', event_id=event.id) }}" class="btn btn-ghost btn-sm">View</a>
-                                <form method="POST" action="{{ url_for('admin.delete_event', event_id=event.id) }}" style="display: inline;" onsubmit="return confirm('Delete this event?');">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--primary);">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <div class="admin-filters">
+                <form method="GET" class="filter-form">
+                    <div class="filter-row">
+                        <input type="text" name="search" class="search-input" placeholder="Search by title..." value="{{ search or '' }}">
+                        <select name="cas_type" class="filter-select">
+                            <option value="">All CAS Types</option>
+                            <option value="Creativity" {% if cas_type == 'Creativity' %}selected{% endif %}>Creativity</option>
+                            <option value="Activity" {% if cas_type == 'Activity' %}selected{% endif %}>Activity</option>
+                            <option value="Service" {% if cas_type == 'Service' %}selected{% endif %}>Service</option>
+                        </select>
+                        <select name="status" class="filter-select">
+                            <option value="">All Status</option>
+                            <option value="published" {% if status == 'published' %}selected{% endif %}>Published</option>
+                            <option value="draft" {% if status == 'draft' %}selected{% endif %}>Draft</option>
+                        </select>
+                        <button type="submit" class="btn btn-secondary">Filter</button>
+                        <a href="{{ url_for('admin.manage_events') }}" class="btn btn-ghost">Clear</a>
+                    </div>
+                </form>
             </div>
+            
+            {% if events.items %}
+            <form id="bulk-form" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="bulk-actions">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="select-all" class="checkbox-input">
+                        <span class="checkbox-custom"></span>
+                        <span>Select All</span>
+                    </label>
+                    <div class="bulk-buttons">
+                        <button type="button" class="btn btn-secondary btn-sm" id="bulk-publish-btn" disabled>Publish</button>
+                        <button type="button" class="btn btn-secondary btn-sm" id="bulk-unpublish-btn" disabled>Unpublish</button>
+                        <button type="button" class="btn btn-ghost btn-sm" id="bulk-delete-btn" disabled style="color: var(--primary);">Delete</button>
+                    </div>
+                    <span class="selected-count" id="selected-count"></span>
+                </div>
+                
+                <div class="admin-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="checkbox-col">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" class="checkbox-input select-all-checkbox">
+                                        <span class="checkbox-custom"></span>
+                                    </label>
+                                </th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Registrations</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in events.items %}
+                            <tr>
+                                <td class="checkbox-col">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="event_ids" value="{{ event.id }}" class="checkbox-input row-checkbox">
+                                        <span class="checkbox-custom"></span>
+                                    </label>
+                                </td>
+                                <td>{{ event.title }}</td>
+                                <td><span class="tag cas-{{ event.cas_type|lower }}">{{ event.cas_type }}</span></td>
+                                <td>{{ event.event_date.strftime('%b %d, %Y') }}</td>
+                                <td>
+                                    <span class="status-badge {% if event.is_published %}status-published{% else %}status-draft{% endif %}">
+                                        {{ 'Published' if event.is_published else 'Draft' }}
+                                    </span>
+                                </td>
+                                <td>{{ event.get_registered_count() }}{% if event.max_capacity %} / {{ event.max_capacity }}{% endif %}</td>
+                                <td class="action-buttons">
+                                    <a href="{{ url_for('admin.event_participants', event_id=event.id) }}" class="btn btn-ghost btn-sm">Participants</a>
+                                    <a href="{{ url_for('admin.edit_event', event_id=event.id) }}" class="btn btn-ghost btn-sm">Edit</a>
+                                    <a href="{{ url_for('events.detail', event_id=event.id) }}" class="btn btn-ghost btn-sm">View</a>
+                                    <form method="POST" action="{{ url_for('admin.delete_event', event_id=event.id) }}" style="display: inline;" onsubmit="return confirm('Delete this event?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--primary);">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+            
+            {% if events.pages > 1 %}
+            <div class="pagination">
+                <a href="{{ url_for('admin.manage_events', page=events.prev_num, search=search, cas_type=cas_type, status=status) }}" 
+                   class="pagination-btn {% if not events.has_prev %}disabled{% endif %}">Previous</a>
+                <div class="pagination-numbers">
+                    {% for p in events.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                        {% if p %}
+                            <a href="{{ url_for('admin.manage_events', page=p, search=search, cas_type=cas_type, status=status) }}" 
+                               class="pagination-num {% if p == events.page %}active{% endif %}">{{ p }}</a>
+                        {% else %}
+                            <span class="pagination-ellipsis">...</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <a href="{{ url_for('admin.manage_events', page=events.next_num, search=search, cas_type=cas_type, status=status) }}" 
+                   class="pagination-btn {% if not events.has_next %}disabled{% endif %}">Next</a>
+            </div>
+            <div class="pagination-info">
+                Showing {{ events.items|length }} of {{ events.total }} events
+            </div>
+            {% endif %}
             {% else %}
             <div class="empty-state">
-                <h3>No events yet</h3>
+                <h3>No events found</h3>
+                {% if search or cas_type or status %}
+                <p>Try adjusting your filters or <a href="{{ url_for('admin.manage_events') }}">clear them</a>.</p>
+                {% else %}
                 <p>Create your first event to get started.</p>
+                {% endif %}
                 <a href="{{ url_for('admin.create_event') }}" class="btn btn-primary" style="margin-top: 1rem;">Create Event</a>
             </div>
             {% endif %}
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selectAllCheckboxes = document.querySelectorAll('.select-all-checkbox');
+    const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+    const bulkPublishBtn = document.getElementById('bulk-publish-btn');
+    const bulkUnpublishBtn = document.getElementById('bulk-unpublish-btn');
+    const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+    const selectedCount = document.getElementById('selected-count');
+    const bulkForm = document.getElementById('bulk-form');
+    const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+
+    function updateBulkButtons() {
+        const checkedCount = document.querySelectorAll('.row-checkbox:checked').length;
+        
+        bulkPublishBtn.disabled = checkedCount === 0;
+        bulkUnpublishBtn.disabled = checkedCount === 0;
+        bulkDeleteBtn.disabled = checkedCount === 0;
+        
+        if (checkedCount > 0) {
+            selectedCount.textContent = `${checkedCount} selected`;
+        } else {
+            selectedCount.textContent = '';
+        }
+        
+        selectAllCheckboxes.forEach(cb => {
+            cb.checked = checkedCount > 0 && checkedCount === rowCheckboxes.length;
+        });
+    }
+
+    selectAllCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            rowCheckboxes.forEach(cb => cb.checked = this.checked);
+            updateBulkButtons();
+        });
+    });
+
+    document.getElementById('select-all').addEventListener('change', function() {
+        rowCheckboxes.forEach(cb => cb.checked = this.checked);
+        selectAllCheckboxes.forEach(cb => cb.checked = this.checked);
+        updateBulkButtons();
+    });
+
+    rowCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateBulkButtons);
+    });
+
+    bulkPublishBtn.addEventListener('click', function() {
+        if (this.disabled) return;
+        const checkedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
+        
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/admin/events/bulk-publish';
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrf_token';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+        
+        const publishInput = document.createElement('input');
+        publishInput.type = 'hidden';
+        publishInput.name = 'publish';
+        publishInput.value = 'true';
+        form.appendChild(publishInput);
+        
+        checkedIds.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'event_ids';
+            input.value = id;
+            form.appendChild(input);
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
+    });
+
+    bulkUnpublishBtn.addEventListener('click', function() {
+        if (this.disabled) return;
+        const checkedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
+        
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/admin/events/bulk-publish';
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrf_token';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+        
+        const publishInput = document.createElement('input');
+        publishInput.type = 'hidden';
+        publishInput.name = 'publish';
+        publishInput.value = 'false';
+        form.appendChild(publishInput);
+        
+        checkedIds.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'event_ids';
+            input.value = id;
+            form.appendChild(input);
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
+    });
+
+    bulkDeleteBtn.addEventListener('click', function() {
+        if (this.disabled) return;
+        
+        const checkedCount = document.querySelectorAll('.row-checkbox:checked').length;
+        if (!confirm(`Are you sure you want to delete ${checkedCount} event(s)? This action cannot be undone.`)) {
+            return;
+        }
+        
+        const checkedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
+        
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/admin/events/bulk-delete';
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrf_token';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+        
+        checkedIds.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'event_ids';
+            input.value = id;
+            form.appendChild(input);
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
+    });
+});
+</script>
 {% endblock %}

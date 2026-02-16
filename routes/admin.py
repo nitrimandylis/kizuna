@@ -49,8 +49,64 @@ def dashboard():
 @admin_required
 def manage_events():
     page = request.args.get('page', 1, type=int)
-    events = Event.query.order_by(Event.event_date.desc()).paginate(page=page, per_page=20)
-    return render_template('admin/events.html', events=events)
+    search = request.args.get('search', '').strip()
+    cas_type = request.args.get('cas_type', '').strip()
+    status = request.args.get('status', '').strip()
+    
+    query = Event.query
+    
+    if search:
+        query = query.filter(Event.title.ilike(f'%{search}%'))
+    
+    if cas_type:
+        query = query.filter(Event.cas_type == cas_type)
+    
+    if status == 'published':
+        query = query.filter(Event.is_published.is_(True))
+    elif status == 'draft':
+        query = query.filter(Event.is_published.is_(False))
+    
+    events = query.order_by(Event.event_date.desc()).paginate(page=page, per_page=20)
+    
+    return render_template('admin/events.html', events=events, search=search, cas_type=cas_type, status=status)
+
+@admin_bp.route('/events/bulk-delete', methods=['POST'])
+@login_required
+@admin_required
+def bulk_delete_events():
+    event_ids = request.form.getlist('event_ids', type=int)
+    
+    if not event_ids:
+        flash('No events selected', 'error')
+        return redirect(url_for('admin.manage_events'))
+    
+    deleted_count = Event.query.filter(Event.id.in_(event_ids)).delete(synchronize_session='fetch')
+    db.session.commit()
+    
+    logger.info(f"Bulk deleted {deleted_count} events by admin: {current_user.username}")
+    flash(f'{deleted_count} event(s) deleted', 'success')
+    return redirect(url_for('admin.manage_events'))
+
+@admin_bp.route('/events/bulk-publish', methods=['POST'])
+@login_required
+@admin_required
+def bulk_publish_events():
+    event_ids = request.form.getlist('event_ids', type=int)
+    publish = request.form.get('publish') == 'true'
+    
+    if not event_ids:
+        flash('No events selected', 'error')
+        return redirect(url_for('admin.manage_events'))
+    
+    updated_count = Event.query.filter(Event.id.in_(event_ids)).update(
+        {'is_published': publish}, synchronize_session='fetch'
+    )
+    db.session.commit()
+    
+    action = 'published' if publish else 'unpublished'
+    logger.info(f"Bulk {action} {updated_count} events by admin: {current_user.username}")
+    flash(f'{updated_count} event(s) {action}', 'success')
+    return redirect(url_for('admin.manage_events'))
 
 @admin_bp.route('/events/create', methods=['GET', 'POST'])
 @login_required
