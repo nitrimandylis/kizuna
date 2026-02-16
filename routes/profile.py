@@ -1,6 +1,6 @@
 import logging
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, logout_user
 from models import db, User, EventRegistration, Event
 from utils import validate_email, validate_password
 
@@ -46,12 +46,10 @@ def edit():
         
         errors = []
         
-        # Validate email
         valid, email_result = validate_email(email)
         if not valid:
             errors.append(email_result)
         elif email != current_user.email:
-            # Check if email is already taken
             existing = User.query.filter_by(email=email).first()
             if existing and existing.id != current_user.id:
                 errors.append('Email already in use')
@@ -61,13 +59,11 @@ def edit():
                 flash(error, 'error')
             return render_template('profile/edit.html')
         
-        # Update email if changed
         if email != current_user.email:
             current_user.email = email
             current_user.email_verified = False
             logger.info(f"User {current_user.username} changed email to {email}")
             
-            # Create new verification token
             from models import EmailVerificationToken
             from datetime import datetime, timedelta
             import secrets
@@ -105,11 +101,9 @@ def change_password():
         
         errors = []
         
-        # Verify current password
         if not current_user.check_password(current_password):
             errors.append('Current password is incorrect')
         
-        # Validate new password
         valid, password_result = validate_password(new_password)
         if not valid:
             errors.append(password_result)
@@ -122,7 +116,6 @@ def change_password():
                 flash(error, 'error')
             return render_template('profile/change_password.html')
         
-        # Update password
         current_user.set_password(new_password)
         db.session.commit()
         
@@ -131,3 +124,41 @@ def change_password():
         return redirect(url_for('profile.index'))
     
     return render_template('profile/change_password.html')
+
+
+@profile_bp.route('/delete', methods=['GET', 'POST'])
+@login_required
+def delete_account():
+    """Delete user account with password confirmation."""
+    if request.method == 'POST':
+        password = request.form.get('password', '')
+        confirmation = request.form.get('confirmation', '')
+        
+        errors = []
+        
+        if not current_user.check_password(password):
+            errors.append('Password is incorrect')
+        
+        if confirmation != 'DELETE':
+            errors.append('Please type DELETE to confirm')
+        
+        if errors:
+            for error in errors:
+                flash(error, 'error')
+            return render_template('profile/delete_account.html')
+        
+        user_id = current_user.id
+        username = current_user.username
+        
+        EventRegistration.query.filter_by(user_id=user_id).delete()
+        
+        logout_user()
+        
+        User.query.filter_by(id=user_id).delete()
+        db.session.commit()
+        
+        logger.info(f"User {username} deleted their account")
+        flash('Your account has been permanently deleted.', 'success')
+        return redirect(url_for('auth.login'))
+    
+    return render_template('profile/delete_account.html')
