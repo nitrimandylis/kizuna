@@ -1,22 +1,17 @@
 services:
   - type: web
     name: kizuna
-    runtime: python
+    env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn --config gunicorn.conf.py "app:create_app()"
+    startCommand: gunicorn app:app
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
       - key: FLASK_ENV
         value: production
-      - key: PYTHON_VERSION
-        value: 3.11.0
       - key: SECRET_KEY
         generateValue: true
       - key: DATABASE_URL
-        fromDatabase:
-          name: kizuna-db
-          property: connectionString
-
-databases:
-  - name: kizuna-db
-    databaseName: kizuna
-    user: kizuna
+        sync: false  # You'll set this manually from Supabase
+      - key: SESSION_COOKIE_SECURE
+        value: true
