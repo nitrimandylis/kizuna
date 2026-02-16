@@ -1956,24 +1956,7 @@ main {
    ═════════════════════════════════════════════════════════════════════════ */
 
 /* Skip to main content link */
-.skip-link {
-    position: absolute;
-    top: -40px;
-    left: 0;
-    background: var(--primary);
-    color: white;
-    padding: 0.5rem 1rem;
-    z-index: 1000;
-    font-weight: 600;
-    border-radius: 0 0 4px 0;
-    transition: top 0.2s ease;
-}
 
-.skip-link:focus {
-    top: 0;
-    outline: 2px solid white;
-    outline-offset: 2px;
-}
 
 /* Focus indicators */
 :focus-visible {
