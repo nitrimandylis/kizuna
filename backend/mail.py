@@ -14,34 +14,6 @@ def init_mail(app):
     mail.init_app(app)
 
 
-def send_verification_email(user, token):
-    """Send email verification link to user."""
-    if not current_app.config.get('MAIL_SERVER') or current_app.config['MAIL_SERVER'] == 'localhost':
-        # Development mode - just log the verification URL
-        verify_url = url_for('auth.verify_email', token=token, _external=True)
-        logger.info(f"Email verification for {user.email}: {verify_url}")
-        return verify_url
-    
-    try:
-        verify_url = url_for('auth.verify_email', token=token, _external=True)
-        
-        msg = Message(
-            subject='Verify Your Email - Kizuna',
-            recipients=[user.email],
-            html=render_template('emails/verify_email.html', 
-                               user=user, verify_url=verify_url),
-            text=render_template('emails/verify_email.txt',
-                               user=user, verify_url=verify_url)
-        )
-        
-        mail.send(msg)
-        logger.info(f"Verification email sent to {user.email}")
-        return True
-    except Exception as e:
-        logger.error(f"Failed to send verification email: {e}")
-        return False
-
-
 def send_password_reset_email(user, token):
     """Send password reset link to user."""
     if not current_app.config.get('MAIL_SERVER') or current_app.config['MAIL_SERVER'] == 'localhost':

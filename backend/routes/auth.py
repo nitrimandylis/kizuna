@@ -3,95 +3,11 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from models import db, User, PasswordResetToken, EmailVerificationToken
 from datetime import datetime, timedelta
-from utils import validate_username, validate_email, validate_password, check_rate_limit, get_client_ip
+from utils import validate_password, check_rate_limit, get_client_ip
 import secrets
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 logger = logging.getLogger(__name__)
-
-@auth_bp.route('/register', methods=['GET', 'POST'])
-def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
-    
-    # Rate limit by IP
-    ip = get_client_ip()
-    allowed, remaining = check_rate_limit(f'register:{ip}', max_requests=5, window_seconds=3600)
-    if not allowed:
-        logger.warning(f"Registration rate limited for IP: {ip}")
-        flash(f'Too many registration attempts. Please try again in {remaining // 60} minutes.', 'error')
-        return render_template('auth/register.html')
-
-    if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        email = request.form.get('email', '').strip().lower()
-        password = request.form.get('password', '')
-        confirm_password = request.form.get('confirm_password', '')
-
-        # Validation
-        errors = []
-        
-        valid, username_result = validate_username(username)
-        if not valid:
-            errors.append(username_result)
-        
-        valid, email_result = validate_email(email)
-        if not valid:
-            errors.append(email_result)
-        
-        valid, password_result = validate_password(password)
-        if not valid:
-            errors.append(password_result)
-        
-        if password != confirm_password:
-            errors.append('Passwords do not match')
-
-        if errors:
-            for error in errors:
-                flash(error, 'error')
-            return render_template('auth/register.html')
-
-        # Check existing
-        if User.query.filter_by(username=username).first():
-            logger.info(f"Registration attempt with existing username: {username}")
-            flash('Username already taken', 'error')
-            return render_template('auth/register.html')
-
-        if User.query.filter_by(email=email).first():
-            logger.info(f"Registration attempt with existing email: {email}")
-            flash('Email already registered', 'error')
-            return render_template('auth/register.html')
-
-        # Create user
-        user = User(username=username, email=email, email_verified=False)
-        user.set_password(password)
-        db.session.add(user)
-        
-        # Create verification token
-        token = secrets.token_urlsafe(32)
-        verification_token = EmailVerificationToken(
-            user_id=user.id,
-            token=token,
-            expires_at=datetime.utcnow() + timedelta(hours=24)
-        )
-        db.session.add(verification_token)
-        db.session.commit()
-        
-        logger.info(f"New user registered: {username} ({email}) from IP: {ip}")
-        
-        # Send verification email
-        from mail import send_verification_email
-        result = send_verification_email(user, token)
-        
-        if isinstance(result, str):
-            # Development mode - show the link
-            flash(f'Account created! Verify your email: {result}', 'info')
-        else:
-            flash('Account created! Please check your email to verify your account.', 'success')
-        
-        return redirect(url_for('auth.login'))
-
-    return render_template('auth/register.html')
 
 
 @auth_bp.route('/verify-email/<token>')
@@ -117,50 +33,11 @@ def verify_email(token):
     return redirect(url_for('auth.login'))
 
 
-@auth_bp.route('/resend-verification', methods=['GET', 'POST'])
-def resend_verification():
-    if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
-    
-    if request.method == 'POST':
-        email = request.form.get('email', '').strip().lower()
-        user = User.query.filter_by(email=email).first()
-        
-        if user and not user.email_verified:
-            # Invalidate old tokens
-            EmailVerificationToken.query.filter_by(user_id=user.id, used=False).update({'used': True})
-            
-            # Create new token
-            token = secrets.token_urlsafe(32)
-            verification_token = EmailVerificationToken(
-                user_id=user.id,
-                token=token,
-                expires_at=datetime.utcnow() + timedelta(hours=24)
-            )
-            db.session.add(verification_token)
-            db.session.commit()
-            
-            from mail import send_verification_email
-            result = send_verification_email(user, token)
-            
-            if isinstance(result, str):
-                flash(f'Verification link: {result}', 'info')
-            else:
-                flash('Verification email sent! Check your inbox.', 'success')
-        else:
-            flash('If that email is registered and unverified, a new verification link has been sent.', 'info')
-        
-        return redirect(url_for('auth.login'))
-    
-    return render_template('auth/resend_verification.html')
-
-
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     
-    # Rate limit by IP
     ip = get_client_ip()
     allowed, remaining = check_rate_limit(f'login:{ip}', max_requests=10, window_seconds=300)
     if not allowed:
@@ -182,11 +59,6 @@ def login():
         ).first()
 
         if user and user.check_password(password):
-            # Check if email is verified (skip for admin users)
-            if not user.email_verified and not user.is_admin:
-                flash('Please verify your email before logging in. Check your inbox or request a new verification link.', 'warning')
-                return redirect(url_for('auth.resend_verification'))
-            
             login_user(user, remember=remember)
             logger.info(f"User logged in: {user.username} from IP: {ip}")
             next_page = request.args.get('next')
@@ -278,7 +150,6 @@ def reset_password(token):
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     
-    # Rate limit by IP
     ip = get_client_ip()
     allowed, remaining = check_rate_limit(f'reset:{ip}', max_requests=5, window_seconds=300)
     if not allowed:
@@ -306,7 +177,6 @@ def reset_password(token):
             flash('Passwords do not match', 'error')
             return render_template('auth/reset_password.html', token=token)
 
-        # Update password
         username = reset_token.user.username
         reset_token.user.set_password(password)
         reset_token.used = True
