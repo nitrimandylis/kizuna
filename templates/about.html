@@ -4,54 +4,223 @@
 
 {% block content %}
 <div class="standard-page">
-    <div class="page-header">
+    <section class="about-hero">
         <div class="container">
-            <h1>About</h1>
-            <p>Connecting the IBDP community</p>
+            <h1 class="about-hero-title">The Kizuna Initiative</h1>
+            <p class="about-hero-subtitle">
+                The Kizuna Initiative is a proposed self-governing, student-led committee designed to unite and empower the IBDP student community through structured collaboration, academic enrichment, and meaningful service.
+            </p>
+            
+            <div class="about-hero-aims">
+                <span class="aim-badge">Coordinate CAS Experiences</span>
+                <span class="aim-badge">Launch Competition-oriented Clubs</span>
+                <span class="aim-badge">Organize Community Events</span>
+            </div>
+            
+            <blockquote class="about-hero-quote">
+                <p>"We bring together people who want to build things, share ideas, and turn the IB experience into something more than just exams and deadlines."</p>
+            </blockquote>
         </div>
-    </div>
+    </section>
 
     <div class="page-content">
-        <div class="container" style="max-width: 720px;">
-            <div class="card">
-                <div class="detail-section">
-                    <h3 style="font-size: 1.25rem; margin-bottom: 1rem;">The Kizuna Initiative</h3>
-                    <p style="color: var(--text-muted); line-height: 1.8;">
-                        The Kizuna Initiative is a proposed self-governing, student-led committee designed to unite and empower the IBDP student community through structured collaboration, academic enrichment, and meaningful service.
-                    </p>
+        <div class="container">
+            <div class="about-content-grid">
+                <div class="about-graph-section">
+                    <div class="card about-graph-card">
+                        <img src="{{ url_for('static', filename='images/graph@3x.png') }}" alt="Kizuna Connection Graph" class="about-graph-image">
+                    </div>
                 </div>
                 
-                <div class="detail-section">
-                    <h4 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--text-secondary);">What We Aim to Achieve:</h4>
-                    <ul style="color: var(--text-muted); line-height: 1.8; margin-left: 1.25rem;">
-                        <li>Coordinate CAS Experiences</li>
-                        <li>Launch competition-oriented Clubs</li>
-                        <li>Organize Community Events</li>
-                    </ul>
-                </div>
-
-                <div class="detail-section">
-                    <p style="color: var(--text-muted); line-height: 1.8;">
-                        We bring together people who want to build things, share ideas, and turn the IB experience into something more than just exams and deadlines.
-                    </p>
-                </div>
-            </div>
-
-            <div class="card" style="margin-top: 1.5rem;">
-                <div class="detail-section" style="text-align: center;">
-                    <img src="{{ url_for('static', filename='images/graph@3x.png') }}" alt="Kizuna Graph" style="max-width: 100%; height: auto; border-radius: 8px;">
-                </div>
-            </div>
-
-            <div class="card" style="margin-top: 1.5rem;">
-                <div class="detail-section">
-                    <h3 style="font-size: 1.25rem; margin-bottom: 1rem;">Kizuna (絆)</h3>
-                    <p style="color: var(--text-muted); line-height: 1.8;">
-                        Kizuna (絆) is a Japanese word meaning 'bonds between people'. Our initiative is about creating bonds across the IBDP community. Connecting students working on similar CAS projects, linking passionate learners through subject clubs, and building lasting relationships through shared events.
-                    </p>
+                <div class="about-meaning-section">
+                    <div class="card about-meaning-card">
+                        <div class="detail-section">
+                            <h2 class="about-meaning-title">Kizuna <span class="about-kanji">(絆)</span></h2>
+                            <p class="about-meaning-text">
+                                Kizuna (絆) is a Japanese word meaning 'bonds between people'. Our initiative is about creating bonds across the IBDP community. Connecting students working on similar CAS projects, linking passionate learners through subject clubs, and building lasting relationships through shared events.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.about-hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-lighter) 50%, var(--navy) 100%);
+    padding: 5rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.about-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center top, rgba(254, 67, 89, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.about-hero .container {
+    max-width: 800px;
+    position: relative;
+    z-index: 1;
+}
+
+.about-hero-title {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+    animation: fadeInUp 0.6s ease;
+}
+
+.about-hero-subtitle {
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    color: var(--text-muted);
+    line-height: 1.8;
+    max-width: 680px;
+    margin: 0 auto 2.5rem;
+    animation: fadeInUp 0.6s ease 0.1s both;
+}
+
+.about-hero-aims {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 3rem;
+    animation: fadeInUp 0.6s ease 0.2s both;
+}
+
+.aim-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: rgba(254, 67, 89, 0.12);
+    color: var(--primary-light);
+    border: 1px solid rgba(254, 67, 89, 0.25);
+    border-radius: 50px;
+    transition: var(--transition);
+}
+
+.aim-badge:hover {
+    background: rgba(254, 67, 89, 0.2);
+    border-color: rgba(254, 67, 89, 0.4);
+    transform: translateY(-2px);
+}
+
+.about-hero-quote {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem;
+    background: var(--bg-elevated);
+    border-left: 3px solid var(--primary);
+    border-radius: 0 8px 8px 0;
+    text-align: left;
+    animation: fadeInUp 0.6s ease 0.3s both;
+}
+
+.about-hero-quote p {
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.7;
+    margin: 0;
+}
+
+.about-content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.about-graph-card {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.about-graph-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.about-meaning-card {
+    height: 100%;
+}
+
+.about-meaning-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text);
+}
+
+.about-kanji {
+    color: var(--primary);
+    font-weight: 400;
+}
+
+.about-meaning-text {
+    color: var(--text-muted);
+    line-height: 1.9;
+    font-size: 1.05rem;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .about-hero {
+        padding: 3rem 1.5rem;
+    }
+    
+    .about-hero-quote {
+        padding: 1.25rem 1.5rem;
+        margin: 0 0.5rem;
+    }
+    
+    .about-hero-quote p {
+        font-size: 1rem;
+    }
+    
+    .about-content-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .about-hero-aims {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .aim-badge {
+        width: 100%;
+        max-width: 280px;
+        justify-content: center;
+    }
+}
+</style>
 {% endblock %}
