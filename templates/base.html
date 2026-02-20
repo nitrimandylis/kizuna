@@ -35,11 +35,7 @@
                             <li role="none">
                                 <a href="{{ url_for('profile.index') }}" class="user-dropdown-item" role="menuitem">Profile</a>
                             </li>
-                            {% if current_user.is_admin %}
-                            <li role="none">
-                                <a href="{{ url_for('admin.dashboard') }}" class="user-dropdown-item" role="menuitem">Admin</a>
-                            </li>
-                            {% endif %}
+
                             <li role="none">
                                 <a href="{{ url_for('auth.logout') }}" class="user-dropdown-item" role="menuitem">Logout</a>
                             </li>
@@ -74,28 +70,28 @@
         </main>
         <footer class="footer" role="contentinfo">
             <div class="footer-content">
-                <div class="footer-brand">© <span id="current-year">2024</span> Kizuna Initiative</div>
                 <div class="footer-links">
                     <a href="{{ url_for('main.about') }}">About</a>
                     <a href="{{ url_for('clubs.index') }}">Clubs</a>
                     <a href="{{ url_for('events.index') }}">Events</a>
                     <a href="{{ url_for('main.faq') }}">FAQ</a>
-                </div>
-                <div class="footer-legal">
-                    <a href="{{ url_for('main.privacy') }}">Privacy Policy</a>
-                    <a href="{{ url_for('main.terms') }}">Terms of Service</a>
+                    {% if current_user.is_authenticated and current_user.is_admin %}
+                    <a href="{{ url_for('admin.dashboard') }}">Admin Portal</a>
+                    {% endif %}
                 </div>
                 <div class="footer-social">
-                    <a href="https://www.instagram.com/kizuna.initiative/" class="social-link" aria-label="Instagram" target="_blank" rel="noopener">📸</a>
+                    <a href="https://www.instagram.com/kizuna.initiative/" class="social-link" aria-label="Instagram" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                        </svg>
+                    </a>
                 </div>
             </div>
         </footer>
     </div>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script>
-        // Set current year in footer
-        document.getElementById('current-year').textContent = new Date().getFullYear();
-    </script>
 </body>
 </html>
