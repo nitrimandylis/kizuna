@@ -45,7 +45,6 @@ def send_password_reset_email(user, token):
 def send_event_registration_email(user, event):
     """Send event registration confirmation email."""
     event_url = url_for('events.detail', event_id=event.id, _external=True)
-    profile_url = url_for('profile.index', _external=True)
     
     if not current_app.config.get('MAIL_SERVER') or current_app.config['MAIL_SERVER'] == 'localhost':
         logger.info(f"Event registration: {user.email} for '{event.title}' - {event_url}")
@@ -57,10 +56,10 @@ def send_event_registration_email(user, event):
             recipients=[user.email],
             html=render_template('emails/event_registration.html',
                                user=user, event=event, 
-                               event_url=event_url, profile_url=profile_url),
+                               event_url=event_url),
             text=render_template('emails/event_registration.txt',
                                user=user, event=event,
-                               event_url=event_url, profile_url=profile_url)
+                               event_url=event_url)
         )
         
         mail.send(msg)

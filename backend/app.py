@@ -123,15 +123,12 @@ def create_app(config_name=None):
     from routes.events import events_bp
     from routes.admin import admin_bp
     from routes.newsletter import newsletter_bp
-    from routes.profile import profile_bp
-
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(clubs_bp)
     app.register_blueprint(events_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(newsletter_bp)
-    app.register_blueprint(profile_bp)
 
     # Error handlers
     @app.errorhandler(404)
