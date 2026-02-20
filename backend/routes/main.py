@@ -21,10 +21,6 @@ def privacy():
 def terms():
     return render_template('terms.html')
 
-@main_bp.route('/faq')
-def faq():
-    return render_template('faq.html')
-
 @main_bp.route('/api/events')
 def get_events():
     """API endpoint to fetch events for calendar"""
