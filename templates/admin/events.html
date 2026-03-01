@@ -40,11 +40,6 @@
                     </form>
                 </div>
                 <div class="bulk-actions">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="select-all" class="checkbox-input">
-                        <span class="checkbox-custom"></span>
-                        <span>Select All</span>
-                    </label>
                     <div class="bulk-buttons">
                         <button type="button" class="btn btn-secondary btn-sm" id="bulk-publish-btn" disabled>Publish</button>
                         <button type="button" class="btn btn-secondary btn-sm" id="bulk-unpublish-btn" disabled>Unpublish</button>
@@ -184,12 +179,6 @@ document.addEventListener('DOMContentLoaded', function() {
             rowCheckboxes.forEach(cb => cb.checked = this.checked);
             updateBulkButtons();
         });
-    });
-
-    document.getElementById('select-all').addEventListener('change', function() {
-        rowCheckboxes.forEach(cb => cb.checked = this.checked);
-        selectAllCheckboxes.forEach(cb => cb.checked = this.checked);
-        updateBulkButtons();
     });
 
     rowCheckboxes.forEach(checkbox => {
