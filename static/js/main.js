@@ -224,7 +224,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (dateStr && eventsByDate[dateStr]) {
                     const visibleEvents = eventsByDate[dateStr].slice(0, 3);
                     visibleEvents.forEach(function(event) {
-                        html += '<a href="/events/' + event.id + '" class="calendar-event cas-' + event.cas_type + '" title="' + event.title + '">';
+                        const cas_types = event.cas_type.split(',');
+                        const primary_cas_type = cas_types[0].toLowerCase();
+                        html += '<a href="/events/' + event.id + '" class="calendar-event cas-' + primary_cas_type + '" title="' + event.title + '">';
                         html += event.title;
                         html += '</a>';
                     });
