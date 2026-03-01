@@ -93,7 +93,10 @@
                                     </span>
                                 </td>
                                 <td>{{ event.get_registered_count() }}{% if event.max_capacity %} / {{ event.max_capacity }}{% endif %}</td>
-                                    <a href="#" class="btn btn-ghost btn-sm delete-event-btn" data-event-id="{{ event.id }}" style="color: var(--primary);">Delete</a>
+                                <td class="action-buttons">
+                                    <a href="{{ url_for('admin.event_participants', event_id=event.id) }}" class="btn btn-ghost btn-sm">Participants</a>
+                                    <a href="{{ url_for('admin.edit_event', event_id=event.id) }}" class="btn btn-ghost btn-sm">Edit</a>
+                                    <a href="{{ url_for('events.detail', event_id=event.id) }}" class="btn btn-ghost btn-sm">View</a>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -272,27 +275,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         document.body.appendChild(form);
         form.submit();
-    });
-
-    document.querySelectorAll('.delete-event-btn').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (confirm('Delete this event?')) {
-                const eventId = this.dataset.eventId;
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = `/admin/events/${eventId}/delete`;
-                
-                const csrfInput = document.createElement('input');
-                csrfInput.type = 'hidden';
-                csrfInput.name = 'csrf_token';
-                csrfInput.value = csrfToken;
-                form.appendChild(csrfInput);
-                
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
     });
 });
 </script>
