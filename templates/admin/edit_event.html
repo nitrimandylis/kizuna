@@ -27,13 +27,18 @@
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label" for="cas_type">CAS Type</label>
-                        <select id="cas_type" name="cas_type" class="form-input" required>
-                            <option value="">Select type...</option>
-                            <option value="Creativity" {% if event.cas_type == 'Creativity' %}selected{% endif %}>Creativity</option>
-                            <option value="Activity" {% if event.cas_type == 'Activity' %}selected{% endif %}>Activity</option>
-                            <option value="Service" {% if event.cas_type == 'Service' %}selected{% endif %}>Service</option>
-                        </select>
+                        <label class="form-label">CAS Type</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="cas_type" value="Creativity" {% if 'Creativity' in event.cas_type %}checked{% endif %}> Creativity
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="cas_type" value="Activity" {% if 'Activity' in event.cas_type %}checked{% endif %}> Activity
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="cas_type" value="Service" {% if 'Service' in event.cas_type %}checked{% endif %}> Service
+                            </label>
+                        </div>
                     </div>
                     
                     <div class="form-group">

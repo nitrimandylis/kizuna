@@ -95,17 +95,21 @@ def validate_description(description, max_length=5000):
     
     return True, sanitize_input(description, max_length)
 
-def validate_cas_type(cas_type):
+def validate_cas_type(cas_types):
     """Validate CAS type"""
     valid_types = ['Creativity', 'Activity', 'Service']
     
-    if not cas_type:
+    if not cas_types:
         return False, "CAS type is required"
     
-    if cas_type not in valid_types:
-        return False, "Invalid CAS type"
+    if isinstance(cas_types, str):
+        cas_types = [cas_types]
+
+    for cas_type in cas_types:
+        if cas_type not in valid_types:
+            return False, "Invalid CAS type"
     
-    return True, cas_type
+    return True, ",".join(cas_types)
 
 def validate_integer(value, field_name="Value", min_val=None, max_val=None):
     """Validate integer input"""

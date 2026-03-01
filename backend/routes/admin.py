@@ -118,7 +118,7 @@ def create_event():
             errors.append(description)
         
         # Validate CAS type
-        valid, cas_type = validate_cas_type(request.form.get('cas_type', ''))
+        valid, cas_type = validate_cas_type(request.form.getlist('cas_type'))
         if not valid:
             errors.append(cas_type)
         
@@ -208,7 +208,7 @@ def edit_event(event_id):
             event.description = description
         
         # Validate CAS type
-        valid, cas_type = validate_cas_type(request.form.get('cas_type', ''))
+        valid, cas_type = validate_cas_type(request.form.getlist('cas_type'))
         if not valid:
             errors.append(cas_type)
         else:

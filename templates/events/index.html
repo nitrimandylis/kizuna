@@ -42,7 +42,11 @@
                 <article class="card">
                     <div class="card-header-row">
                         <div class="card-title-section">
-                            <span class="tag cas-{{ event.cas_type|lower }}">{{ event.cas_type }}</span>
+                            <div>
+                                {% for type in event.cas_type.split(',') %}
+                                <span class="tag cas-{{ type|lower }}">{{ type }}</span>
+                                {% endfor %}
+                            </div>
                             <h3>{{ event.title }}</h3>
                         </div>
                     </div>

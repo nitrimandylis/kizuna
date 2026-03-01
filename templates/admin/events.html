@@ -84,7 +84,11 @@
                                     </label>
                                 </td>
                                 <td>{{ event.title }}</td>
-                                <td><span class="tag cas-{{ event.cas_type|lower }}">{{ event.cas_type }}</span></td>
+                                <td>
+                                    {% for type in event.cas_type.split(',') %}
+                                    <span class="tag cas-{{ type|lower }}">{{ type }}</span>
+                                    {% endfor %}
+                                </td>
                                 <td>{{ event.event_date.strftime('%b %d, %Y') }}</td>
                                 <td>
                                     <span class="status-badge {% if event.is_published %}status-published{% else %}status-draft{% endif %}">

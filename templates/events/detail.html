@@ -8,7 +8,11 @@
         <div class="container">
             <a href="{{ url_for('events.index') }}" class="back-link">Back to Events</a>
             <h1>{{ event.title }}</h1>
-            <p><span class="tag cas-{{ event.cas_type|lower }}">{{ event.cas_type }}</span></p>
+            <p>
+                {% for type in event.cas_type.split(',') %}
+                <span class="tag cas-{{ type|lower }}">{{ type }}</span>
+                {% endfor %}
+            </p>
         </div>
     </div>
 
@@ -110,7 +114,9 @@
                         <div class="related-event-title">{{ related.title }}</div>
                         <div class="related-event-meta">
                             <span>{{ related.event_date.strftime('%b %d, %Y') }}</span>
-                            <span class="tag tag-sm cas-{{ related.cas_type|lower }}">{{ related.cas_type }}</span>
+                            {% for type in related.cas_type.split(',') %}
+                            <span class="tag tag-sm cas-{{ type|lower }}">{{ type }}</span>
+                            {% endfor %}
                         </div>
                     </a>
                     {% endfor %}
