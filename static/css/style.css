@@ -499,6 +499,7 @@ main {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    cursor: pointer;
 }
 
 .calendar-event.cas-creativity {
@@ -1866,6 +1867,11 @@ main {
 }
 
 .status-attended {
+    background: rgba(251, 191, 36, 0.2);
+    color: var(--warning);
+}
+
+.status-maybe {
     background: rgba(251, 191, 36, 0.2);
     color: var(--warning);
 }

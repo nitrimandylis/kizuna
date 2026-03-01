@@ -73,6 +73,7 @@ def register(event_id):
     if request.method == 'POST':
         full_name = request.form.get('full_name', '').strip()
         email = request.form.get('email', '').strip().lower()
+        status = request.form.get('status', 'confirmed').strip()
 
         if not full_name or not email:
             flash('Please fill in all fields.', 'error')
@@ -91,7 +92,8 @@ def register(event_id):
         registration = EventRegistration(
             event_id=event_id,
             full_name=full_name,
-            email=email
+            email=email,
+            status=status
         )
 
         db.session.add(registration)
