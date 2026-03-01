@@ -2,8 +2,9 @@ import logging
 from functools import wraps
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
-from models import db, Event, EventRegistration, User, Club
+from models import db, Event, EventRegistration, Club
 from datetime import datetime
+from time import time
 from utils import (
     sanitize_input, validate_title, validate_description, 
     validate_cas_type, validate_integer, validate_url
@@ -28,21 +29,12 @@ def admin_required(f):
 def dashboard():
     total_events = Event.query.count()
     total_registrations = EventRegistration.query.count()
-    total_users = User.query.count()
-    
-    recent_registrations = EventRegistration.query.order_by(EventRegistration.registered_at.desc()).limit(5).all()
-    recent_users = User.query.order_by(User.created_at.desc()).limit(5).all()
-    upcoming_events = Event.query.filter(Event.event_date >= datetime.utcnow()).order_by(Event.event_date.asc()).limit(5).all()
     
     logger.debug(f"Admin dashboard accessed by: {current_user.username}")
 
     return render_template('admin/dashboard.html',
                          total_events=total_events,
-                         total_registrations=total_registrations,
-                         total_users=total_users,
-                         recent_registrations=recent_registrations,
-                         recent_users=recent_users,
-                         upcoming_events=upcoming_events)
+                         total_registrations=total_registrations)
 
 @admin_bp.route('/events')
 @login_required
@@ -404,31 +396,6 @@ def delete_club(club_id):
     flash('Club deleted', 'success')
     return redirect(url_for('admin.manage_clubs'))
 
-# User Management
-@admin_bp.route('/users')
-@login_required
-@admin_required
-def manage_users():
-    page = request.args.get('page', 1, type=int)
-    users = User.query.order_by(User.created_at.desc()).paginate(page=page, per_page=20)
-    return render_template('admin/users.html', users=users)
-
-@admin_bp.route('/users/<int:user_id>/toggle-admin', methods=['POST'])
-@login_required
-@admin_required
-def toggle_admin(user_id):
-    user = User.query.get_or_404(user_id)
-    if user.id == current_user.id:
-        flash('Cannot modify your own admin status', 'error')
-        return redirect(url_for('admin.manage_users'))
-    
-    user.is_admin = not user.is_admin
-    db.session.commit()
-    logger.info(f"Admin status toggled for user '{user.username}' (ID: {user.id}) to {user.is_admin} by admin: {current_user.username}")
-    flash(f"Admin status {'granted' if user.is_admin else 'revoked'}", 'success')
-    return redirect(url_for('admin.manage_users'))
-
-# Event Participants Export
 @admin_bp.route('/events/<int:event_id>/participants')
 @login_required
 @admin_required
@@ -475,95 +442,5 @@ def toggle_attendance(event_id, reg_id):
     db.session.commit()
     logger.info(f"Attendance toggled for '{registration.full_name}' (ID: {reg_id}) - {action} by admin: {current_user.username}")
     flash(f'{registration.full_name} {action}', 'success')
-    return redirect(url_for('admin.event_participants', event_id=event_id))
-
-
-@admin_bp.route('/events/<int:event_id>/export/csv')
-@login_required
-@admin_required
-def export_event_participants_csv(event_id):
-    """Export event participants as CSV."""
-    from flask import Response
-    import csv
-    from io import StringIO
-    
-    event = Event.query.get_or_404(event_id)
-    registrations = EventRegistration.query.filter_by(event_id=event_id).order_by(EventRegistration.registered_at).all()
-    
-    # Create CSV in memory
-    output = StringIO()
-    writer = csv.writer(output)
-    
-    # Write header
-    writer.writerow([
-        'Full Name',
-        'Email',
-        'Phone',
-        'Status',
-        'Hours Contributed',
-        'Registered At',
-        'Notes'
-    ])
-    
-    # Write data
-    for reg in registrations:
-        writer.writerow([
-            reg.full_name or '',
-            reg.email or '',
-            reg.phone or '',
-            reg.status or 'confirmed',
-            reg.hours_contributed or 0,
-            reg.registered_at.strftime('%Y-%m-%d %H:%M:%S') if reg.registered_at else '',
-            reg.notes or ''
-        ])
-    
-    output.seek(0)
-    
-    # Create response
-    response = Response(
-        output.getvalue(),
-        mimetype='text/csv',
-        headers={
-            'Content-Disposition': f'attachment; filename={event.title.replace(" ", "_")}_participants.csv'
-        }
-    )
-    
-    logger.info(f"Exported participants for event '{event.title}' (ID: {event_id}) by admin: {current_user.username}")
-    return response
-
-
-@admin_bp.route('/events/<int:event_id>/export/json')
-@login_required
-@admin_required
-def export_event_participants_json(event_id):
-    """Export event participants as JSON."""
-    from flask import jsonify
-    
-    event = Event.query.get_or_404(event_id)
-    registrations = EventRegistration.query.filter_by(event_id=event_id).order_by(EventRegistration.registered_at).all()
-    
-    data = {
-        'event': {
-            'id': event.id,
-            'title': event.title,
-            'cas_type': event.cas_type,
-            'event_date': event.event_date.isoformat() if event.event_date else None,
-            'location': event.location
-        },
-        'participants': [
-            {
-                'full_name': reg.full_name,
-                'email': reg.email,
-                'phone': reg.phone,
-                'status': reg.status,
-                'hours_contributed': reg.hours_contributed,
-                'registered_at': reg.registered_at.isoformat() if reg.registered_at else None,
-                'notes': reg.notes
-            }
-            for reg in registrations
-        ],
-        'total': len(registrations)
-    }
-    
-    logger.info(f"Exported participants (JSON) for event '{event.title}' (ID: {event_id}) by admin: {current_user.username}")
-    return jsonify(data)
+    from time import time
+    return redirect(url_for('admin.event_participants', event_id=event_id) + '?t=' + str(time()))

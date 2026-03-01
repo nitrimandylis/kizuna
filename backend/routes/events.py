@@ -1,7 +1,6 @@
 import logging
 from datetime import date
-from flask import Blueprint, render_template, request, redirect, url_for, flash, make_response
-from flask_login import login_required, current_user
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from models import db, Event, EventRegistration
 from sqlalchemy import or_, func
 
@@ -40,29 +39,12 @@ def index():
 
     events = query.order_by(Event.event_date.desc()).paginate(page=page, per_page=20)
     
-    registered_event_ids = set()
-    if current_user.is_authenticated:
-        registered_event_ids = set(
-            r.event_id for r in EventRegistration.query.filter_by(
-                user_id=current_user.id,
-                status='confirmed'
-            ).all()
-        )
-    
-    return render_template('events/index.html', events=events, selected_type=cas_type, search=search, registered_event_ids=registered_event_ids)
+    return render_template('events/index.html', events=events, selected_type=cas_type, search=search)
 
 @events_bp.route('/<int:event_id>')
 def detail(event_id):
     event = Event.query.get_or_404(event_id)
-    is_registered = False
-
-    if current_user.is_authenticated:
-        is_registered = EventRegistration.query.filter_by(
-            event_id=event_id, 
-            user_id=current_user.id,
-            status='confirmed'
-        ).first() is not None
-
+    
     today = date.today()
     related_query = Event.query.filter(
         Event.id != event_id,
@@ -82,91 +64,56 @@ def detail(event_id):
     
     related_events = related_query.order_by(Event.event_date.asc()).limit(3).all()
 
-    return render_template('events/detail.html', event=event, is_registered=is_registered, related_events=related_events)
+    return render_template('events/detail.html', event=event, related_events=related_events)
 
-@events_bp.route('/<int:event_id>/register', methods=['POST'])
-@login_required
+@events_bp.route('/<int:event_id>/register', methods=['GET', 'POST'])
 def register(event_id):
     event = Event.query.get_or_404(event_id)
 
-    # Check if already registered
-    if EventRegistration.query.filter_by(event_id=event_id, user_id=current_user.id).first():
-        flash('You are already registered for this event', 'warning')
-        return redirect(url_for('events.detail', event_id=event_id))
+    if request.method == 'POST':
+        full_name = request.form.get('full_name', '').strip()
+        email = request.form.get('email', '').strip().lower()
 
-    # Check capacity with database-level count for accuracy
-    if event.max_capacity:
-        current_count = db.session.query(func.count(EventRegistration.id)).filter(
-            EventRegistration.event_id == event_id,
-            EventRegistration.status == 'confirmed'
-        ).scalar()
-        
-        if current_count >= event.max_capacity:
-            logger.warning(f"Registration attempt for full event: '{event.title}' (ID: {event_id}) by user: {current_user.username}")
-            flash('This event is at full capacity', 'error')
+        if not full_name or not email:
+            flash('Please fill in all fields.', 'error')
+            return render_template('events/register.html', event=event)
+
+        # Check if already registered
+        if EventRegistration.query.filter_by(event_id=event_id, email=email).first():
+            flash('You are already registered for this event with this email address.', 'warning')
             return redirect(url_for('events.detail', event_id=event_id))
 
-    registration = EventRegistration(
-        event_id=event_id,
-        user_id=current_user.id,
-        full_name=current_user.username,
-        email=current_user.email
-    )
+        # Check capacity
+        if event.is_full():
+            flash('This event is at full capacity.', 'error')
+            return redirect(url_for('events.detail', event_id=event_id))
 
-    db.session.add(registration)
-    db.session.commit()
-    
-    logger.info(f"User registered for event: '{event.title}' (ID: {event_id}) - user: {current_user.username}")
-    
-    # Send confirmation email
-    try:
-        from mail import send_event_registration_email
-        send_event_registration_email(current_user, event)
-    except Exception as e:
-        logger.error(f"Failed to send registration email: {e}")
-        # Don't fail the registration if email fails
+        registration = EventRegistration(
+            event_id=event_id,
+            full_name=full_name,
+            email=email
+        )
 
-    flash('Successfully registered for the event!', 'success')
-    return redirect(url_for('events.detail', event_id=event_id))
+        db.session.add(registration)
+        db.session.commit()
+        
+        logger.info(f"New registration for event: '{event.title}' (ID: {event_id}) - Name: {full_name}, Email: {email}")
+        
+        # Send confirmation email
+        try:
+            from mail import send_event_registration_email
+            # The send_event_registration_email function needs a user object, so we create a dummy one
+            class DummyUser:
+                def __init__(self, full_name, email):
+                    self.username = full_name
+                    self.email = email
+            
+            dummy_user = DummyUser(full_name, email)
+            send_event_registration_email(dummy_user, event)
+        except Exception as e:
+            logger.error(f"Failed to send registration email: {e}")
 
-@events_bp.route('/<int:event_id>/unregister', methods=['POST'])
-@login_required
-def unregister(event_id):
-    registration = EventRegistration.query.filter_by(
-        event_id=event_id,
-        user_id=current_user.id
-    ).first_or_404()
+        flash('Successfully registered for the event!', 'success')
+        return redirect(url_for('events.detail', event_id=event_id))
 
-    db.session.delete(registration)
-    db.session.commit()
-    
-    logger.info(f"User unregistered from event ID: {event_id} - user: {current_user.username}")
-
-    flash('You have been unregistered from the event', 'success')
-    return redirect(url_for('events.detail', event_id=event_id))
-
-@events_bp.route('/<int:event_id>/download-ics')
-def download_ics(event_id):
-    event = Event.query.get_or_404(event_id)
-    
-    dtstart = event.event_date.strftime('%Y%m%dT%H%M%SZ')
-    dtend = event.end_date.strftime('%Y%m%dT%H%M%SZ') if event.end_date else dtstart
-    
-    ics_content = f"""BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Kizuna//EN
-BEGIN:VEVENT
-UID:{event_id}@kizuna
-DTSTART:{dtstart}
-DTEND:{dtend}
-SUMMARY:{event.title}
-DESCRIPTION:{event.description or ''}
-LOCATION:{event.location or ''}
-END:VEVENT
-END:VCALENDAR"""
-    
-    response = make_response(ics_content)
-    response.headers['Content-Type'] = 'text/calendar; charset=utf-8'
-    response.headers['Content-Disposition'] = f'attachment; filename=event_{event_id}.ics'
-    
-    return response
+    return render_template('events/register.html', event=event)

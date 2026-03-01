@@ -30,22 +30,6 @@ class User(UserMixin, db.Model):
         return f'<User {self.username}>'
 
 
-class EmailVerificationToken(db.Model):
-    __tablename__ = 'email_verification_tokens'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    token = db.Column(db.String(100), unique=True, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    expires_at = db.Column(db.DateTime, nullable=False)
-    used = db.Column(db.Boolean, default=False)
-    
-    user = db.relationship('User', backref='verification_tokens')
-    
-    def is_valid(self):
-        return not self.used and datetime.utcnow() < self.expires_at
-
-
 class Club(db.Model):
     __tablename__ = 'clubs'
 
@@ -106,7 +90,7 @@ class EventRegistration(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     full_name = db.Column(db.String(120))
     email = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(20))
@@ -123,25 +107,9 @@ class NewsletterSubscription(db.Model):
     __tablename__ = 'newsletter_subscriptions'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     is_active = db.Column(db.Boolean, default=True)
     subscribed_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return f'<NewsletterSubscription {self.user_id}>'
-
-
-class PasswordResetToken(db.Model):
-    __tablename__ = 'password_reset_tokens'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    token = db.Column(db.String(100), unique=True, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    expires_at = db.Column(db.DateTime, nullable=False)
-    used = db.Column(db.Boolean, default=False)
-    
-    user = db.relationship('User', backref='reset_tokens')
-    
-    def is_valid(self):
-        return not self.used and datetime.utcnow() < self.expires_at

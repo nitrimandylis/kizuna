@@ -1924,17 +1924,7 @@ main {
     color: var(--warning);
 }
 
-.export-summary {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    background: var(--navy-light);
-    border-radius: 8px;
-    font-size: 0.9rem;
-}
 
-.export-summary p {
-    margin: 0.25rem 0;
-}
 
 @media (max-width: 768px) {
     .admin-header {

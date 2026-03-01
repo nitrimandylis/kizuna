@@ -28,8 +28,6 @@
                     {{ event.event_date.strftime('%B %d, %Y') }}</p>
                 </div>
                 <div class="admin-actions no-print">
-                    <a href="{{ url_for('admin.export_event_participants_csv', event_id=event.id) }}" class="btn btn-secondary">Export CSV</a>
-                    <a href="{{ url_for('admin.export_event_participants_json', event_id=event.id) }}" class="btn btn-secondary">Export JSON</a>
                     <button onclick="window.print()" class="btn btn-secondary">Print</button>
                     {% if emails_bcc %}
                     <a href="mailto:?bcc={{ emails_bcc }}" class="btn btn-primary">Email All Participants</a>
@@ -62,10 +60,10 @@
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
-                            <th>Phone</th>
+                            <th class="no-print">Phone</th>
                             <th>Status</th>
-                            <th>Hours</th>
-                            <th>Registered</th>
+                            <th class="no-print">Hours</th>
+                            <th class="no-print">Registered</th>
                             <th class="no-print">Actions</th>
                         </tr>
                     </thead>
@@ -74,12 +72,12 @@
                         <tr>
                             <td>{{ reg.full_name or '-' }}</td>
                             <td>{{ reg.email }}</td>
-                            <td>{{ reg.phone or '-' }}</td>
+                            <td class="no-print">{{ reg.phone or '-' }}</td>
                             <td>
                                 <span class="status-badge status-{{ reg.status }}">{{ reg.status.title() }}</span>
                             </td>
-                            <td>{{ reg.hours_contributed or 0 }}</td>
-                            <td>{{ reg.registered_at.strftime('%Y-%m-%d') }}</td>
+                            <td class="no-print">{{ reg.hours_contributed or 0 }}</td>
+                            <td class="no-print">{{ reg.registered_at.strftime('%Y-%m-%d') }}</td>
                             <td class="no-print">
                                 <form action="{{ url_for('admin.toggle_attendance', event_id=event.id, reg_id=reg.id) }}" method="POST" style="display: inline;">
                                     <button type="submit" class="btn btn-sm {% if reg.status == 'attended' %}btn-secondary{% else %}btn-primary{% endif %}" 
@@ -94,11 +92,6 @@
                 </table>
             </div>
             
-            <div class="export-summary">
-                <p><strong>Total Participants:</strong> {{ registrations|length }}</p>
-                <p><strong>Confirmed:</strong> {{ registrations|selectattr('status', 'equalto', 'confirmed')|list|length }}</p>
-                <p><strong>Attended:</strong> {{ registrations|selectattr('status', 'equalto', 'attended')|list|length }}</p>
-            </div>
             {% else %}
             <div class="empty-state">
                 <h3>No participants yet</h3>

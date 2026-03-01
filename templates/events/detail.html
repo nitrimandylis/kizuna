@@ -28,10 +28,7 @@
                         <span aria-hidden="true">📍</span> Location
                     </div>
                     <div class="detail-value">{{ event.location }}</div>
-                    <div class="map-placeholder" style="margin-top: 0.75rem;">
-                        <div class="map-placeholder-icon" aria-hidden="true">🗺️</div>
-                        <span>Map coming soon</span>
-                    </div>
+                    
                 </div>
                 {% endif %}
                 
@@ -93,52 +90,15 @@
                 </div>
                 {% endif %}
                 
-                {% if current_user.is_authenticated %}
                 <div class="detail-section" style="padding-top: 1.5rem; border-top: 1px solid var(--border);">
-                    {% if is_registered %}
-                    <div class="registration-status registered" role="status">
-                        <span aria-hidden="true">✓</span> You are registered for this event
-                    </div>
-                    <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
-                        <form method="POST" action="{{ url_for('events.unregister', event_id=event.id) }}" style="flex: 1;">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="btn btn-secondary btn-full">Cancel Registration</button>
-                        </form>
-                        <button type="button" class="btn btn-ghost" onclick="shareEvent()" title="Share event">
-                            <span aria-hidden="true">📤</span> Share
-                        </button>
-                    </div>
-                    {% elif event.is_full() %}
+                    {% if event.is_full() %}
                     <div class="registration-status full" role="status">
                         <span aria-hidden="true">⚠</span> This event is at full capacity
                     </div>
-                    <button type="button" class="btn btn-ghost" onclick="shareEvent()" style="margin-top: 1rem;">
-                        <span aria-hidden="true">📤</span> Share
-                    </button>
                     {% else %}
-                    <div style="display: flex; gap: 0.75rem;">
-                        <form method="POST" action="{{ url_for('events.register', event_id=event.id) }}" style="flex: 1;">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="btn btn-primary btn-full btn-lg">Register Now</button>
-                        </form>
-                        <button type="button" class="btn btn-ghost" onclick="shareEvent()" title="Share event">
-                            <span aria-hidden="true">📤</span>
-                        </button>
-                    </div>
+                    <a href="{{ url_for('events.register', event_id=event.id) }}" class="btn btn-primary btn-full btn-lg">Register Now</a>
                     {% endif %}
-                    
-                    <div style="margin-top: 1rem;">
-                        <a href="{{ url_for('events.download_ics', event_id=event.id) }}" class="btn btn-ghost btn-sm">
-                            <span aria-hidden="true">📆</span> Add to Calendar
-                        </a>
-                    </div>
                 </div>
-                {% else %}
-                <div class="detail-section" style="padding-top: 1.5rem; border-top: 1px solid var(--border);">
-                    <p style="color: var(--text-muted); text-align: center; margin-bottom: 1rem;">Sign in to register for this event</p>
-                    <a href="{{ url_for('auth.login', next=request.path) }}" class="btn btn-primary btn-full">Sign In</a>
-                </div>
-                {% endif %}
             </div>
 
             {% if related_events %}
@@ -161,20 +121,4 @@
     </div>
 </div>
 
-<script>
-function shareEvent() {
-    if (navigator.share) {
-        navigator.share({
-            title: '{{ event.title }}',
-            text: '{{ event.description[:100] if event.description else "" }}',
-            url: window.location.href
-        });
-    } else {
-        // Fallback: copy to clipboard
-        navigator.clipboard.writeText(window.location.href).then(function() {
-            alert('Link copied to clipboard!');
-        });
-    }
-}
-</script>
 {% endblock %}
