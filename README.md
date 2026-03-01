@@ -1,79 +1,31 @@
-# Kizuna Platform
+<div align="center">
+  <img src="static/images/kizuna-logo.svg" alt="Kizuna Logo" width="500"/>
+  <p><strong>Connect. Collaborate. Grow.</strong></p>
+  <p>Your IBDP community for CAS experiences, clubs, and events.</p>
+</div>
 
-A community platform for IBDP students to coordinate CAS experiences, clubs, and events.
+## What is Kizuna?
 
-## Project Structure
+Kizuna (絆) is a Japanese word meaning 'bonds between people'. Our initiative is about creating bonds across the IBDP community. Connecting students working on similar CAS projects, linking passionate learners through subject clubs, and building lasting relationships through shared events.
 
-```
-kizuna/
-├── backend/                # Python backend
-│   ├── app.py              # Flask app factory
-│   ├── config.py           # Configuration settings
-│   ├── models.py           # Database models
-│   ├── utils.py            # Utility functions
-│   ├── mail.py             # Email utilities
-│   ├── logger.py           # Logging configuration
-│   ├── routes/             # Route blueprints
-│   │   ├── auth.py         # Authentication
-│   │   ├── events.py       # Events
-│   │   ├── clubs.py        # Clubs
-│   │   ├── profile.py      # User profiles
-│   │   ├── admin.py        # Admin panel
-│   │   ├── main.py         # Main routes
-│   │   └── newsletter.py   # Newsletter
-│   └── migrations/         # Database migrations
-├── templates/              # Jinja2 HTML templates
-├── static/                 # CSS, JS, images
-├── wsgi.py                 # WSGI entry point
-├── requirements.txt        # Python dependencies
-└── render.yaml             # Render deployment config
-```
+This platform is a self-governing, student-led tool designed to unite and empower the IBDP student community through structured collaboration, academic enrichment, and meaningful service.
 
-## Quick Start
+**[→ Live Demo](https://kizuna-n1pq.onrender.com/)**
 
-```bash
-# Install dependencies
-pip install -r requirements.txt
+## Features
 
-# Set up environment
-cp .env.example .env
-
-# Run database migrations
-cd backend && flask db upgrade && cd ..
-
-# Start development server
-python wsgi.py
-```
-
-Visit http://localhost:5001
-
-## Deployment (Render + Supabase)
-
-1. Create a Supabase project and get the database connection string
-2. Push this repo to GitHub
-3. Create a new Web Service on Render (connect GitHub repo)
-4. Set environment variables:
-   - `DATABASE_URL` - Supabase connection string
-   - `SECRET_KEY` - Random secret key
-5. Deploy!
-
-## Environment Variables
-
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `SECRET_KEY` | Flask secret key for sessions |
-| `MAIL_SERVER` | SMTP server (optional) |
-| `MAIL_USERNAME` | SMTP username (optional) |
-| `MAIL_PASSWORD` | SMTP password (optional) |
+- **Event Discovery:** A centralized calendar to discover all upcoming CAS activities and community gatherings.
+- **Simple Event Registration:** A simple and straightforward event registration process.
+- **Club Directory:** A comprehensive directory of all student-led clubs.
+- **Admin Panel:** A powerful admin panel to manage events, clubs, and participants.
 
 ## Tech Stack
 
 - **Backend:** Flask, SQLAlchemy, Flask-Login
-- **Database:** PostgreSQL (Supabase)
+- **Database:** PostgreSQL
 - **Frontend:** Jinja2 templates, CSS, JavaScript
 - **Deployment:** Render
 
----
+## License
 
-Kizuna Initiative - CGS Athens
+Distributed under the GNU Affero General Public License v3.0. See `LICENSE` for more information.
