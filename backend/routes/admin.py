@@ -410,37 +410,19 @@ def event_participants(event_id):
         first_registration = registrations[0].registered_at
         last_registration = registrations[-1].registered_at
     
-    participant_emails = [reg.email for reg in registrations if reg.email]
-    emails_bcc = ','.join(participant_emails)
-    
     return render_template('admin/event_participants.html', 
                          event=event, 
                          registrations=registrations,
                          first_registration=first_registration,
-                         last_registration=last_registration,
-                         emails_bcc=emails_bcc)
+                         last_registration=last_registration)
 
 
-@admin_bp.route('/events/<int:event_id>/participants/<int:reg_id>/toggle-attendance', methods=['POST'])
+@admin_bp.route('/events/<int:event_id>/participants/print')
 @login_required
 @admin_required
-def toggle_attendance(event_id, reg_id):
-    """Toggle attendance status for a participant."""
+def print_event_participants(event_id):
+    """Print event participants."""
     event = Event.query.get_or_404(event_id)
-    registration = EventRegistration.query.filter_by(id=reg_id, event_id=event_id).first_or_404()
-    
-    if registration.status == 'confirmed':
-        registration.status = 'attended'
-        action = 'marked as attended'
-    elif registration.status == 'attended':
-        registration.status = 'confirmed'
-        action = 'marked as confirmed'
-    else:
-        registration.status = 'confirmed'
-        action = 'marked as confirmed'
-    
-    db.session.commit()
-    logger.info(f"Attendance toggled for '{registration.full_name}' (ID: {reg_id}) - {action} by admin: {current_user.username}")
-    flash(f'{registration.full_name} {action}', 'success')
-    from time import time
-    return redirect(url_for('admin.event_participants', event_id=event_id) + '?t=' + str(time()))
+    registrations = EventRegistration.query.filter_by(event_id=event_id).order_by(EventRegistration.registered_at).all()
+    return render_template('admin/print_participants.html', event=event, registrations=registrations)
+

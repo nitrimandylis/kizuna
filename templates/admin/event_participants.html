@@ -28,10 +28,7 @@
                     {{ event.event_date.strftime('%B %d, %Y') }}</p>
                 </div>
                 <div class="admin-actions no-print">
-                    <button onclick="window.print()" class="btn btn-secondary">Print</button>
-                    {% if emails_bcc %}
-                    <a href="mailto:?bcc={{ emails_bcc }}" class="btn btn-primary">Email All Participants</a>
-                    {% endif %}
+                    <a href="{{ url_for('admin.print_event_participants', event_id=event.id) }}" target="_blank" class="btn btn-secondary">Print</a>
                     <a href="{{ url_for('admin.manage_events') }}" class="btn btn-ghost">Back to Events</a>
                 </div>
             </div>
@@ -64,7 +61,6 @@
                             <th>Status</th>
                             <th class="no-print">Hours</th>
                             <th class="no-print">Registered</th>
-                            <th class="no-print">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -78,14 +74,6 @@
                             </td>
                             <td class="no-print">{{ reg.hours_contributed or 0 }}</td>
                             <td class="no-print">{{ reg.registered_at.strftime('%Y-%m-%d') }}</td>
-                            <td class="no-print">
-                                <form action="{{ url_for('admin.toggle_attendance', event_id=event.id, reg_id=reg.id) }}" method="POST" style="display: inline;">
-                                    <button type="submit" class="btn btn-sm {% if reg.status == 'attended' %}btn-secondary{% else %}btn-primary{% endif %}" 
-                                            title="{% if reg.status == 'attended' %}Mark as not attended{% else %}Mark as attended{% endif %}">
-                                        {% if reg.status == 'attended' %}Undo{% else %}Check In{% endif %}
-                                    </button>
-                                </form>
-                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
