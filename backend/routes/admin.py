@@ -166,7 +166,7 @@ def create_event():
             end_time=end_time,
             location=sanitize_input(request.form.get('location', ''), max_length=200),
             max_capacity=max_capacity,
-            is_published=True
+            is_published=request.form.get('is_published') == 'on'
         )
         
         club_id = request.form.get('club_id')
