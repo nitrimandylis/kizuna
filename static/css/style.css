@@ -2,11 +2,11 @@
 
 /* FONT IMPORTS */
 @font-face {
-    font-family: 'Excalifont';
-    src: url('/static/fonts/Excalifont-Regular.woff2') format('woff2');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
+  font-family: 'Excalifont';
+  src: url('/static/fonts/Excalifont-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 :root {
@@ -1672,6 +1672,11 @@ main {
     color: var(--warning);
 }
 
+.status-maybe {
+    background: rgba(251, 191, 36, 0.2);
+    color: var(--warning);
+}
+
 @media (max-width: 768px) {
     .profile-grid {
         grid-template-columns: 1fr;
@@ -1985,4 +1990,49 @@ textarea:focus-visible {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
+}
+
+/* ═══════════════════════════════════════
+   FILTER SELECT DROPDOWNS
+═══════════════════════════════════════ */
+
+.search-form select,
+.filter-row select,
+select.filter-select {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.6rem 2.25rem 0.6rem 1rem; /* right padding for chevron */
+  font-family: var(--font-system);
+  font-size: 0.95rem;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b8d9a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+select:focus,
+.filter-row select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+select:hover {
+  border-color: var(--primary);
+  background-color: var(--navy-light);
+}
+
+/* Fixes white flash in option list (Chromium) */
+select option {
+  background-color: var(--bg-elevated);
+  color: var(--text);
+}
+
+.admin-filters .filter-form .filter-row select {
+  min-width: 140px;
+  flex-shrink: 0;
 }
