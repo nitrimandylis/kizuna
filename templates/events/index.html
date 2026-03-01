@@ -16,12 +16,8 @@
             <!-- Search and Filter -->
             <div class="list-controls">
                 <form method="GET" action="{{ url_for('events.index') }}" class="search-form">
-                    {% if request.args.get('time') %}
-                    <input type="hidden" name="time" value="{{ request.args.get('time') }}">
-                    {% endif %}
-                    {% if selected_type %}
-                    <input type="hidden" name="type" value="{{ selected_type }}">
-                    {% endif %}
+                    <input type="hidden" name="time" value="{{ request.args.get('time', 'upcoming') }}">
+                    <input type="hidden" name="type" value="{{ selected_type or '' }}">
                     <input type="text" name="q" value="{{ search }}" placeholder="Search events..." class="search-input">
                     <button type="submit" class="btn btn-secondary btn-sm">Search</button>
                     {% if search %}
@@ -34,39 +30,30 @@
                     <a href="{{ url_for('events.index', type='Creativity', q=search, time=request.args.get('time', 'upcoming')) }}" class="filter-tab {% if selected_type == 'Creativity' %}active{% endif %}">Creativity</a>
                     <a href="{{ url_for('events.index', type='Activity', q=search, time=request.args.get('time', 'upcoming')) }}" class="filter-tab {% if selected_type == 'Activity' %}active{% endif %}">Activity</a>
                     <a href="{{ url_for('events.index', type='Service', q=search, time=request.args.get('time', 'upcoming')) }}" class="filter-tab {% if selected_type == 'Service' %}active{% endif %}">Service</a>
-                </div>
-                <div class="filter-tabs">
+                    <span class="filter-separator">|</span>
                     <a href="{{ url_for('events.index', type=selected_type, q=search, time='upcoming') }}" class="filter-tab {% if request.args.get('time') == 'upcoming' or not request.args.get('time') %}active{% endif %}">Upcoming</a>
                     <a href="{{ url_for('events.index', type=selected_type, q=search, time='past') }}" class="filter-tab {% if request.args.get('time') == 'past' %}active{% endif %}">Past</a>
                 </div>
             </div>
 
             {% if events.items %}
-            <div class="view-controls">
-                <div class="view-toggle">
-                    <button class="view-toggle-btn active" data-view="grid" aria-label="Grid view">▦</button>
-                    <button class="view-toggle-btn" data-view="list" aria-label="List view">☰</button>
-                </div>
-            </div>
             <div class="cards-grid">
                 {% for event in events.items %}
-                {% set remaining = event.max_capacity - event.get_registered_count() if event.max_capacity else None %}
-                {% set is_registered = event.id in registered_event_ids %}
                 <article class="card">
-                    <span class="tag cas-{{ event.cas_type|lower }}">{{ event.cas_type }}</span>
-                    {% if is_registered %}
-                    <span class="badge badge-registered">Registered</span>
-                    {% endif %}
-                    <h3>{{ event.title }}</h3>
+                    <div class="card-header-row">
+                        <div class="card-title-section">
+                            <span class="tag cas-{{ event.cas_type|lower }}">{{ event.cas_type }}</span>
+                            <h3>{{ event.title }}</h3>
+                        </div>
+                    </div>
                     <p>{{ event.description[:120] }}{% if event.description|length > 120 %}...{% endif %}</p>
                     <div class="card-meta">
                         <span>📅 {% if event.event_date.hour or event.event_date.minute %}{{ event.event_date.strftime('%B %d, %Y at %I:%M %p') }}{% else %}{{ event.event_date.strftime('%B %d, %Y') }}{% endif %}</span>
                         {% if event.location %}<span>📍 {{ event.location }}</span>{% endif %}
-                        {% if event.max_capacity and remaining <= 5 %}
-                        <span class="capacity-low">{{ remaining }} spot{{ 's' if remaining != 1 else '' }} left</span>
-                        {% endif %}
                     </div>
-                    <a href="{{ url_for('events.detail', event_id=event.id) }}" class="btn btn-ghost btn-sm" style="margin-top: 1rem;">View Details →</a>
+                    <div style="margin-top: 1rem;">
+                        <a href="{{ url_for('events.detail', event_id=event.id) }}" class="btn btn-primary btn-sm">View Details</a>
+                    </div>
                 </article>
                 {% endfor %}
             </div>
