@@ -1947,3 +1947,36 @@ textarea:focus-visible {
     color: var(--border);
     margin: 0 0.5rem;
 }
+
+.admin-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.admin-filters .filter-form .filter-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.bulk-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+    background: var(--navy-light);
+    border-radius: 8px;
+}
+
+.bulk-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.cas-type-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}

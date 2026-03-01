@@ -18,30 +18,27 @@
                 <a href="{{ url_for('admin.create_event') }}" class="btn btn-primary">Create Event</a>
             </div>
             
-            <div class="admin-filters">
-                <form method="GET" class="filter-form">
-                    <div class="filter-row">
-                        <input type="text" name="search" class="search-input" placeholder="Search by title..." value="{{ search or '' }}">
-                        <select name="cas_type" class="filter-select">
-                            <option value="">All CAS Types</option>
-                            <option value="Creativity" {% if cas_type == 'Creativity' %}selected{% endif %}>Creativity</option>
-                            <option value="Activity" {% if cas_type == 'Activity' %}selected{% endif %}>Activity</option>
-                            <option value="Service" {% if cas_type == 'Service' %}selected{% endif %}>Service</option>
-                        </select>
-                        <select name="status" class="filter-select">
-                            <option value="">All Status</option>
-                            <option value="published" {% if status == 'published' %}selected{% endif %}>Published</option>
-                            <option value="draft" {% if status == 'draft' %}selected{% endif %}>Draft</option>
-                        </select>
-                        <button type="submit" class="btn btn-secondary">Filter</button>
-                        <a href="{{ url_for('admin.manage_events') }}" class="btn btn-ghost">Clear</a>
-                    </div>
-                </form>
-            </div>
-            
-            {% if events.items %}
-            <form id="bulk-form" method="POST">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="admin-controls">
+                <div class="admin-filters">
+                    <form method="GET" class="filter-form">
+                        <div class="filter-row">
+                            <input type="text" name="search" class="search-input" placeholder="Search by title..." value="{{ search or '' }}">
+                            <select name="cas_type" class="filter-select">
+                                <option value="">All CAS Types</option>
+                                <option value="Creativity" {% if cas_type == 'Creativity' %}selected{% endif %}>Creativity</option>
+                                <option value="Activity" {% if cas_type == 'Activity' %}selected{% endif %}>Activity</option>
+                                <option value="Service" {% if cas_type == 'Service' %}selected{% endif %}>Service</option>
+                            </select>
+                            <select name="status" class="filter-select">
+                                <option value="">All Status</option>
+                                <option value="published" {% if status == 'published' %}selected{% endif %}>Published</option>
+                                <option value="draft" {% if status == 'draft' %}selected{% endif %}>Draft</option>
+                            </select>
+                            <button type="submit" class="btn btn-secondary">Filter</button>
+                            <a href="{{ url_for('admin.manage_events') }}" class="btn btn-ghost">Clear</a>
+                        </div>
+                    </form>
+                </div>
                 <div class="bulk-actions">
                     <label class="checkbox-label">
                         <input type="checkbox" id="select-all" class="checkbox-input">
@@ -55,6 +52,11 @@
                     </div>
                     <span class="selected-count" id="selected-count"></span>
                 </div>
+            </div>
+            
+            {% if events.items %}
+            <form id="bulk-form" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 
                 <div class="admin-table">
                     <table>
@@ -84,7 +86,7 @@
                                     </label>
                                 </td>
                                 <td>{{ event.title }}</td>
-                                <td>
+                                <td class="cas-type-cell">
                                     {% for type in event.cas_type.split(',') %}
                                     <span class="tag cas-{{ type|lower }}">{{ type }}</span>
                                     {% endfor %}

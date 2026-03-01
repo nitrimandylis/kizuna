@@ -214,12 +214,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const eventCount = eventsByDate[dateStr] ? eventsByDate[dateStr].length : 0;
                 
-                html += '<div class="' + classes.join(' ') + '" data-date="' + dateStr + '" tabindex="0" role="button" aria-label="' + (dateStr ? new Date(dateStr).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) : '') + (eventCount ? ', ' + eventCount + ' event' + (eventCount > 1 ? 's' : '') : '') + '">';
+                html += '<div class="' + classes.join(' ') + '" data-date="' + dateStr + '" tabindex="0" role="button" aria-label="' + (dateStr ? new Date(dateStr).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) : '') + '">';
                 html += '<div class="calendar-day-header">';
                 html += '<span class="calendar-day-number">' + dayNumber + '</span>';
-                if (eventCount > 0) {
-                    html += '<span class="event-count" aria-hidden="true">' + eventCount + '</span>';
-                }
                 html += '</div>';
                 html += '<div class="calendar-day-content">';
                 
@@ -231,9 +228,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         html += event.title;
                         html += '</div>';
                     });
-                    if (eventsByDate[dateStr].length > 3) {
-                        html += '<div class="calendar-more">+' + (eventsByDate[dateStr].length - 3) + ' more</div>';
-                    }
                 }
                 
                 html += '</div>';
