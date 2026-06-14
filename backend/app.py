@@ -5,9 +5,9 @@ from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 from flask_talisman import Talisman
 from flask_compress import Compress
-from config import config
-from models import db
-from logger import setup_logging
+from .config import config
+from .models import db
+from .logger import setup_logging
 
 login_manager = LoginManager()
 csrf = CSRFProtect()
@@ -40,7 +40,7 @@ def create_app(config_name=None):
     compress.init_app(app)
     
     # Initialize Flask-Mail
-    from mail import init_mail
+    from .mail import init_mail
     init_mail(app)
     
     # Configure Talisman for security headers
@@ -84,7 +84,7 @@ def create_app(config_name=None):
 
     @login_manager.user_loader
     def load_user(user_id):
-        from models import User
+        from .models import User
         return User.query.get(int(user_id))
 
     # Request logging
@@ -117,12 +117,12 @@ def create_app(config_name=None):
             session.permanent = True
     
     # Register blueprints
-    from routes.auth import auth_bp
-    from routes.main import main_bp
-    from routes.clubs import clubs_bp
-    from routes.events import events_bp
-    from routes.admin import admin_bp
-    from routes.newsletter import newsletter_bp
+    from .routes.auth import auth_bp
+    from .routes.main import main_bp
+    from .routes.clubs import clubs_bp
+    from .routes.events import events_bp
+    from .routes.admin import admin_bp
+    from .routes.newsletter import newsletter_bp
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(clubs_bp)
@@ -165,7 +165,7 @@ def create_app(config_name=None):
             logger.info("Database tables created successfully")
             
             # Create admin user if not exists
-            from models import User
+            from .models import User
             admin_username = os.getenv('ADMIN_USERNAME', 'admin')
             admin_password = os.getenv('ADMIN_PASSWORD', 'admin123')
             

@@ -1,9 +1,9 @@
 import logging
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
-from models import db, User
+from ..models import db, User
 from datetime import datetime, timedelta
-from utils import check_rate_limit, get_client_ip
+from ..utils import check_rate_limit, get_client_ip
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 logger = logging.getLogger(__name__)
