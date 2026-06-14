@@ -13,51 +13,46 @@ def setup_logging(app):
     # Set log level based on environment
     log_level = logging.DEBUG if app.debug else logging.INFO
     
-    # Create logs directory if it doesn't exist
-    if not os.path.exists('logs'):
-        os.makedirs('logs')
-    
-    # File handler for all logs
-    file_handler = RotatingFileHandler(
-        'logs/kizuna.log',
-        maxBytes=10 * 1024 * 1024,  # 10 MB
-        backupCount=10
-    )
-    file_handler.setLevel(log_level)
-    file_handler.setFormatter(logging.Formatter(
-        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-    ))
-    
-    # Error-only file handler
-    error_handler = RotatingFileHandler(
-        'logs/errors.log',
-        maxBytes=10 * 1024 * 1024,
-        backupCount=10
-    )
-    error_handler.setLevel(logging.ERROR)
-    error_handler.setFormatter(logging.Formatter(
-        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-    ))
-    
-    # Console handler
+    fmt = logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
+
+    # Console handler (always available, works in serverless)
     console_handler = logging.StreamHandler()
     console_handler.setLevel(log_level)
-    console_handler.setFormatter(logging.Formatter(
-        '%(levelname)s: %(message)s'
-    ))
-    
+    console_handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
+
     # Configure root logger
     root_logger = logging.getLogger()
     root_logger.setLevel(log_level)
-    
-    # Remove existing handlers to avoid duplicates
+
     for handler in root_logger.handlers[:]:
         root_logger.removeHandler(handler)
-    
-    # Add handlers
-    root_logger.addHandler(file_handler)
-    root_logger.addHandler(error_handler)
+
     root_logger.addHandler(console_handler)
+
+    # File handlers only when filesystem is writable (not Vercel serverless)
+    log_dir = os.environ.get('LOG_DIR', 'logs')
+    try:
+        os.makedirs(log_dir, exist_ok=True)
+        file_handler = RotatingFileHandler(
+            os.path.join(log_dir, 'kizuna.log'),
+            maxBytes=10 * 1024 * 1024,
+            backupCount=10
+        )
+        file_handler.setLevel(log_level)
+        file_handler.setFormatter(fmt)
+
+        error_handler = RotatingFileHandler(
+            os.path.join(log_dir, 'errors.log'),
+            maxBytes=10 * 1024 * 1024,
+            backupCount=10
+        )
+        error_handler.setLevel(logging.ERROR)
+        error_handler.setFormatter(fmt)
+
+        root_logger.addHandler(file_handler)
+        root_logger.addHandler(error_handler)
+    except OSError:
+        pass
     
     # Email handler for production errors
     if not app.debug and app.config.get('MAIL_SERVER'):
