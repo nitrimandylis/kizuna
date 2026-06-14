@@ -190,10 +190,6 @@ def create_app(config_name=None):
     return app
 
 
-# For production (gunicorn app:app)
-app = create_app()
-
-
 if __name__ == '__main__':
     app = create_app()
     logger.info("Starting development server on port 5001")
