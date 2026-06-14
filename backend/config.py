@@ -1,6 +1,7 @@
 import os
 from datetime import timedelta
 from urllib.parse import urlparse, urlunparse
+from sqlalchemy.pool import NullPool
 
 
 def get_database_url():
@@ -116,12 +117,9 @@ class ProductionConfig(Config):
     # Force HTTPS
     PREFERRED_URL_SCHEME = 'https'
     
-    # Production database settings
+    # NullPool for serverless — Neon's PgBouncer handles connection pooling
     SQLALCHEMY_ENGINE_OPTIONS = {
-        'pool_pre_ping': True,
-        'pool_recycle': 300,
-        'pool_size': get_int_env('DB_POOL_SIZE', 10),
-        'max_overflow': get_int_env('DB_MAX_OVERFLOW', 20),
+        'poolclass': NullPool,
     }
 
 
