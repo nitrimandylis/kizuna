@@ -19,55 +19,6 @@ def sanitize_input(text, max_length=None):
     
     return text
 
-def validate_email(email):
-    """Validate email format"""
-    if not email:
-        return False, "Email is required"
-    
-    email = email.strip().lower()
-    
-    if len(email) > 120:
-        return False, "Email is too long"
-    
-    # Simple email regex
-    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    if not re.match(pattern, email):
-        return False, "Invalid email format"
-    
-    return True, email
-
-def validate_username(username):
-    """Validate username format"""
-    if not username:
-        return False, "Username is required"
-    
-    username = username.strip()
-    
-    if len(username) < 3:
-        return False, "Username must be at least 3 characters"
-    
-    if len(username) > 80:
-        return False, "Username is too long"
-    
-    # Allow alphanumeric, underscore, hyphen
-    if not re.match(r'^[a-zA-Z0-9_-]+$', username):
-        return False, "Username can only contain letters, numbers, underscores, and hyphens"
-    
-    return True, username
-
-def validate_password(password):
-    """Validate password strength"""
-    if not password:
-        return False, "Password is required"
-    
-    if len(password) < 6:
-        return False, "Password must be at least 6 characters"
-    
-    if len(password) > 128:
-        return False, "Password is too long"
-    
-    return True, "Password is valid"
-
 def validate_title(title, max_length=200):
     """Validate title/heading fields"""
     if not title:

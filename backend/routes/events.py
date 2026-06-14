@@ -103,7 +103,7 @@ def register(event_id):
         
         # Send confirmation email
         try:
-            from mail import send_event_registration_email
+            from ..mail import send_event_registration_email
             # The send_event_registration_email function needs a user object, so we create a dummy one
             class DummyUser:
                 def __init__(self, full_name, email):

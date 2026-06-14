@@ -14,34 +14,6 @@ def init_mail(app):
     mail.init_app(app)
 
 
-def send_password_reset_email(user, token):
-    """Send password reset link to user."""
-    if not current_app.config.get('MAIL_SERVER') or current_app.config['MAIL_SERVER'] == 'localhost':
-        # Development mode - just log the reset URL
-        reset_url = url_for('auth.reset_password', token=token, _external=True)
-        logger.info(f"Password reset for {user.email}: {reset_url}")
-        return reset_url
-    
-    try:
-        reset_url = url_for('auth.reset_password', token=token, _external=True)
-        
-        msg = Message(
-            subject='Reset Your Password - Kizuna',
-            recipients=[user.email],
-            html=render_template('emails/reset_password.html',
-                               user=user, reset_url=reset_url),
-            text=render_template('emails/reset_password.txt',
-                               user=user, reset_url=reset_url)
-        )
-        
-        mail.send(msg)
-        logger.info(f"Password reset email sent to {user.email}")
-        return True
-    except Exception as e:
-        logger.error(f"Failed to send password reset email: {e}")
-        return False
-
-
 def send_event_registration_email(user, event):
     """Send event registration confirmation email."""
     event_url = url_for('events.detail', event_id=event.id, _external=True)
