@@ -12,7 +12,6 @@
 ![deploy](https://img.shields.io/badge/deployed-render-f0a04b?style=flat-square&labelColor=111111)
 ![cas hours](https://img.shields.io/badge/CAS_hours-coordinated,_not_invented-d64550?style=flat-square&labelColor=111111)
 
-**[→ live demo](https://kizuna-n1pq.onrender.com/)**
 
 </div>
 
@@ -56,8 +55,6 @@ python -m backend.app
 ```
 
 Needs PostgreSQL and the mail/env config from `backend/config.py`.
-Production deploys to [Render](https://render.com) straight from
-`render.yaml` — push, and the bonds go live.
 
 ## 🔩 Under the hood
 
@@ -70,7 +67,7 @@ Production deploys to [Render](https://render.com) straight from
 | 🎨 frontend | `templates/` + `static/` | Jinja2, custom CSS, Excalifont — hand-drawn warmth on purpose |
 | 🚀 deploy | `render.yaml` | the whole production story in one file |
 
-**Stack:** Flask · SQLAlchemy · Flask-Login · PostgreSQL · Jinja2 · Render.
+**Stack:** Flask · SQLAlchemy · Flask-Login · PostgreSQL · Jinja2.
 
 ---
 
