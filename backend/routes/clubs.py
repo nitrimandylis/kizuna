@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from flask import Blueprint, render_template, request
-from models import Club, Event
+from ..models import Club, Event
 from sqlalchemy import or_, func
 
 clubs_bp = Blueprint('clubs', __name__, url_prefix='/clubs')

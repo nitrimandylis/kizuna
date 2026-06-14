@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, url_for, flash
 from flask_login import login_required, current_user
-from models import db, NewsletterSubscription
+from ..models import db, NewsletterSubscription
 
 newsletter_bp = Blueprint('newsletter', __name__, url_prefix='/newsletter')
 

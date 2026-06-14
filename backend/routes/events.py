@@ -1,7 +1,7 @@
 import logging
 from datetime import date
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from models import db, Event, EventRegistration
+from ..models import db, Event, EventRegistration
 from sqlalchemy import or_, func
 
 events_bp = Blueprint('events', __name__, url_prefix='/events')
