@@ -12,6 +12,8 @@
 ![deploy](https://img.shields.io/badge/deployed-render-f0a04b?style=flat-square&labelColor=111111)
 ![cas hours](https://img.shields.io/badge/CAS_hours-coordinated,_not_invented-d64550?style=flat-square&labelColor=111111)
 
+[![kizuna home: connect, collaborate, grow, above this month's events calendar. currently very calm](.github/assets/screenshot.jpg)](https://kizuna-initiative.vercel.app)
+
 
 </div>
 
